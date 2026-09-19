@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useAccount } from "wagmi";
 import { formatUnits } from "viem";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { ClaimFees } from "@/components/ClaimFees";
 import { shortAddr, usd } from "@/lib/format";
 
 interface Launched {
@@ -63,6 +64,8 @@ export default function PortfolioPage() {
         </div>
       ) : (
         <div className="mt-8 space-y-8">
+          <ClaimFees />
+
           <div className="grid gap-3 sm:grid-cols-3">
             <SummaryCard label="Launches" value={String(data?.launched.length ?? (loading ? "…" : 0))} />
             <SummaryCard label="Holdings" value={String(data?.holdings.length ?? (loading ? "…" : 0))} />

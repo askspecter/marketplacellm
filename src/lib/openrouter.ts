@@ -242,6 +242,33 @@ export async function chatWithTools(
   };
 }
 
+/**
+ * Create a crypto top-up charge for OpenRouter credits (the fee → compute
+ * on-ramp). OpenRouter's crypto purchase API returns web3 calldata for paying
+ * with USDC on Base via Coinbase's onchain commerce contract; the treasury
+ * signs and sends that payment to actually add credits. This function only
+ * CREATES the charge — it never moves funds.
+ *
+ * ⚠️ Verify the exact endpoint/shape against current OpenRouter docs before
+ * relying on it (https://openrouter.ai/docs). It is gated server-side by
+ * TREASURY_SECRET and requires OPENROUTER_API_KEY.
+ */
+export async function createCryptoTopup(
+  amountUsd: number,
+  sender: string,
+  chainId = 8453
+): Promise<{ ok: boolean; status: number; data: unknown }> {
+  if (!hasKey()) throw new Error("NO_KEY");
+  const res = await fetch(`${BASE}/credits/coinbase`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify({ amount: amountUsd, sender, chain_id: chainId }),
+    cache: "no-store",
+  });
+  const data = await res.json().catch(() => ({}));
+  return { ok: res.ok, status: res.status, data };
+}
+
 /** Live OpenRouter credit balance for the configured key (funded compute). */
 export async function fetchCredits(): Promise<{ totalCredits: number; totalUsage: number; remaining: number } | null> {
   if (!hasKey()) return null;

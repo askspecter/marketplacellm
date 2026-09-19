@@ -57,9 +57,14 @@ plus a new OpenRouter compute layer. The engine files are copied unchanged.
 - **Compute** — streaming chat against any model (free playground); on an agent
   page it spends that agent’s pool and records the cost.
 - **Portfolio** — your agents (with brain + compute spent) and on-chain holdings.
-- **Treasury keeper** — `POST /api/treasury/sync` derives funded compute from
-  live curve state × ETH/USD and records it per agent (the OpenRouter top-up
-  seam; gate it with `TREASURY_SECRET`).
+- **Claim fees (non-custodial)** — the portfolio shows ETH creator fees accrued
+  in the Pons v2 escrow and lets you `claim()` them (you sign). This is the first
+  half of the fee → compute loop.
+- **Treasury** — `POST /api/treasury/sync` refreshes per-agent funded compute
+  from live curve state × ETH/USD; `POST /api/treasury/topup` creates an
+  OpenRouter crypto top-up charge (the fee → credit on-ramp). Both gated by
+  `TREASURY_SECRET`. See **[docs/TREASURY.md](docs/TREASURY.md)** for the full
+  loop and which steps are automated vs. treasury operations.
 
 No UI or AI code from the reference launchpad was copied — only the on-chain
 engine.
