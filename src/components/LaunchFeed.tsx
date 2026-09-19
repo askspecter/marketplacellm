@@ -10,6 +10,9 @@ interface FeedItem {
   deployer: string;
   model: string | null;
   modelName: string | null;
+  agentName: string | null;
+  ticker: string | null;
+  bio: string | null;
   txHash: string;
 }
 
@@ -49,15 +52,17 @@ export function LaunchFeed() {
           className="group rounded-xl2 border border-bg-line bg-bg-panel p-4 transition hover:border-cyan/40 hover:shadow-glow"
         >
           <div className="flex items-center justify-between">
-            <span className="font-mono text-xs text-white/40">{shortAddr(it.token)}</span>
+            <span className="font-semibold text-white group-hover:text-cyan-soft">
+              {it.agentName ?? "Unnamed agent"}
+              {it.ticker ? <span className="ml-1 font-mono text-xs text-white/40">${it.ticker}</span> : null}
+            </span>
             <span className="rounded-full bg-signature-soft px-2 py-0.5 text-[10px] font-semibold text-cyan-soft">
-              Pons v2
+              agent
             </span>
           </div>
-          <div className="mt-3 text-sm text-white/50">funds model</div>
-          <div className="mt-1 truncate font-semibold text-white group-hover:text-cyan-soft">
-            {it.modelName ?? "— unlinked —"}
-          </div>
+          {it.bio && <p className="mt-2 line-clamp-2 text-xs text-white/50">{it.bio}</p>}
+          <div className="mt-3 text-xs text-white/40">brain</div>
+          <div className="truncate font-mono text-sm text-white/80">{it.modelName ?? "— unlinked —"}</div>
           <div className="mt-3 flex items-center justify-between text-xs text-white/40">
             <span>by {shortAddr(it.deployer)}</span>
             <span className="text-cyan-soft opacity-0 transition group-hover:opacity-100">open →</span>

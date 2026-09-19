@@ -36,7 +36,17 @@ interface TokenData {
 }
 
 interface PoolData {
-  link: { model: string; modelName: string; promptPerM: number; completionPerM: number } | null;
+  link: {
+    model: string;
+    modelName: string;
+    promptPerM: number;
+    completionPerM: number;
+    agentName?: string;
+    ticker?: string;
+    bio?: string;
+    personality?: string;
+    temperature?: number;
+  } | null;
   spendUsd: number;
   creditedUsd: number;
   remainingUsd: number;
@@ -82,6 +92,8 @@ export default function TokenPage({ params }: { params: { address: string } }) {
   if (loading) return <Shell>Loading token…</Shell>;
 
   const model = pool?.link ?? null;
+  const agentName = model?.agentName || data?.name || "Agent";
+  const bio = model?.bio || data?.description || "";
   const curve = data?.curve ?? null;
   const isNative = !data?.pairToken || data.pairToken === "0x0000000000000000000000000000000000000000";
   const progressPct = curve ? Math.min(100, Math.round(curve.progress * 100)) : 0;
@@ -100,7 +112,7 @@ export default function TokenPage({ params }: { params: { address: string } }) {
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
       <Link href="/#feed" className="text-sm text-white/40 hover:text-white">
-        ← All launches
+        ← All agents
       </Link>
 
       <div className="mt-4 grid gap-6 lg:grid-cols-[1.3fr_1fr]">
@@ -115,19 +127,45 @@ export default function TokenPage({ params }: { params: { address: string } }) {
               onError={(e) => ((e.target as HTMLImageElement).style.visibility = "hidden")}
             />
             <div className="min-w-0">
-              <h1 className="truncate text-2xl font-bold">{data?.name ?? "Token"}</h1>
+              <h1 className="truncate text-2xl font-bold">{agentName}</h1>
               <div className="font-mono text-sm text-white/40">
-                ${data?.symbol} · {shortAddr(address)}
+                ${data?.symbol ?? model?.ticker} · {shortAddr(address)}
               </div>
             </div>
-            {data?.phaseLabel && (
-              <span className="ml-auto rounded-full border border-bg-line px-3 py-1 text-xs text-white/60">
-                {data.phaseLabel}
-              </span>
-            )}
+            <span className="ml-auto rounded-full bg-signature-soft px-3 py-1 text-xs font-semibold text-cyan-soft">
+              agent
+            </span>
           </div>
 
-          {data?.description && <p className="text-white/70">{data.description}</p>}
+          {bio && <p className="text-white/70">{bio}</p>}
+
+          {/* Brain + personality */}
+          {model && (
+            <div className="rounded-xl2 border border-bg-line bg-bg-panel p-5">
+              <div className="flex flex-wrap items-center gap-3">
+                <div>
+                  <div className="text-xs uppercase tracking-widest text-white/40">Brain</div>
+                  <div className="mt-1 font-semibold text-white">{model.modelName}</div>
+                  <div className="font-mono text-xs text-white/40">{model.model}</div>
+                </div>
+                {model.temperature != null && (
+                  <span className="ml-auto rounded-full border border-bg-line px-3 py-1 font-mono text-xs text-white/60">
+                    temp {model.temperature.toFixed(2)}
+                  </span>
+                )}
+              </div>
+              {model.personality && (
+                <details className="mt-4 group">
+                  <summary className="cursor-pointer text-xs font-medium text-cyan-soft hover:text-cyan">
+                    Personality (system prompt)
+                  </summary>
+                  <p className="mt-2 whitespace-pre-wrap rounded-lg border border-bg-line bg-bg-soft p-3 text-xs text-white/60">
+                    {model.personality}
+                  </p>
+                </details>
+              )}
+            </div>
+          )}
 
           {/* Price chart */}
           <PriceChart token={address} quoteSymbol={isNative ? "ETH" : "quote"} />
@@ -151,8 +189,8 @@ export default function TokenPage({ params }: { params: { address: string } }) {
             <div className="text-xs uppercase tracking-widest text-cyan-soft">Compute pool</div>
             {model ? (
               <>
-                <div className="mt-2 text-lg font-semibold text-white">Funds {model.modelName}</div>
-                <div className="font-mono text-xs text-white/50">{model.model}</div>
+                <div className="mt-2 text-lg font-semibold text-white">Powers {agentName}’s inference</div>
+                <div className="font-mono text-xs text-white/50">{model.modelName} · {model.model}</div>
                 <div className="mt-4 grid grid-cols-3 gap-3 text-sm">
                   <Stat label="Funded" value={usd(pool?.creditedUsd ?? 0)} />
                   <Stat label="Spent" value={usd(pool?.spendUsd ?? 0)} />
@@ -168,7 +206,7 @@ export default function TokenPage({ params }: { params: { address: string } }) {
               </>
             ) : (
               <div className="mt-2 text-sm text-white/60">
-                This token isn’t linked to a model yet. Launches created here register their model automatically.
+                This token has no agent profile yet. Agents launched here register their brain automatically.
               </div>
             )}
           </div>
@@ -198,7 +236,7 @@ export default function TokenPage({ params }: { params: { address: string } }) {
             </div>
           )}
 
-          {model && <Chat model={model.model} modelName={model.modelName} token={address} />}
+          {model && <Chat model={model.model} modelName={agentName} token={address} />}
         </div>
       </div>
     </div>

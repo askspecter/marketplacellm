@@ -26,6 +26,16 @@ export interface LaunchLink {
   creator?: string;
   txHash?: string;
   createdAt: number;
+  // ── Agent profile (LLMOS-style) ──
+  /** Display name of the agent (mirrors the on-chain token name). */
+  agentName?: string;
+  ticker?: string;
+  /** One-line bio shown on cards and the agent header. */
+  bio?: string;
+  /** System prompt — the agent's authoritative personality. */
+  personality?: string;
+  /** Behavior tuning: sampling temperature (0–2). */
+  temperature?: number;
 }
 
 const KEY_LINK = (token: string) => `llmpad:link:${token.toLowerCase()}`;

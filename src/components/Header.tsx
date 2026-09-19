@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { SITE } from "@/lib/site";
 
 export function Header() {
   return (
@@ -9,14 +10,14 @@ export function Header() {
       <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
         <Link href="/" className="flex items-center gap-2 font-bold tracking-tight">
           <span className="grid h-8 w-8 place-items-center rounded-lg bg-signature text-black font-mono text-sm shadow-glow">
-            &gt;_
+            ◇
           </span>
-          <span className="text-lg">LLMPad</span>
+          <span className="text-lg">{SITE.name}</span>
         </Link>
 
         <nav className="ml-6 hidden items-center gap-5 text-sm text-white/60 sm:flex">
-          <Link href="/create" className="transition hover:text-white">Launch</Link>
-          <Link href="/#feed" className="transition hover:text-white">Feed</Link>
+          <Link href="/create" className="transition hover:text-white">Launch agent</Link>
+          <Link href="/#feed" className="transition hover:text-white">Agents</Link>
           <Link href="/compute" className="transition hover:text-white">Compute</Link>
           <Link href="/portfolio" className="transition hover:text-white">Portfolio</Link>
         </nav>

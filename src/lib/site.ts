@@ -1,6 +1,6 @@
 export const SITE = {
-  name: "LLMPad",
-  tagline: "Every token funds a model.",
+  name: "Agentpad",
+  tagline: "Launch autonomous AI agents.",
   description:
-    "Launch an ETH-paired token on the Pons v2 bonding curve. Trading fees become OpenRouter compute you can spend across 400+ models.",
+    "Deploy an autonomous agent in one transaction — its token, personality, and model. Trading fees fund a shared compute pool that pays for the agent's inference. Built on Pons v2 + OpenRouter.",
 } as const;

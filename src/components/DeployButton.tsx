@@ -17,6 +17,8 @@ export function DeployButton({
   description,
   imageUri,
   model,
+  personality,
+  temperature,
   onLaunched,
 }: {
   name: string;
@@ -24,6 +26,8 @@ export function DeployButton({
   description: string;
   imageUri: string;
   model: PickerModel | null;
+  personality?: string;
+  temperature?: number;
   onLaunched?: (token: string) => void;
 }) {
   const { address, isConnected } = useAccount();
@@ -53,7 +57,18 @@ export function DeployButton({
         fetch("/api/pool", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token, curve, model: model.id, creator: address, txHash: receipt.transactionHash }),
+          body: JSON.stringify({
+            token,
+            curve,
+            model: model.id,
+            creator: address,
+            txHash: receipt.transactionHash,
+            agentName: name.trim(),
+            ticker: ticker.trim().toUpperCase(),
+            bio: description.trim(),
+            personality: personality?.trim() || undefined,
+            temperature,
+          }),
         }).catch(() => {});
         setPhase("done");
         onLaunched?.(token);
@@ -63,7 +78,7 @@ export function DeployButton({
     } catch {
       setPhase("done");
     }
-  }, [receipt, model, address, onLaunched]);
+  }, [receipt, model, address, onLaunched, name, ticker, description, personality, temperature]);
 
   const disabled =
     !isConnected || !model || !name.trim() || !ticker.trim() || phase === "preparing" || phase === "signing" || phase === "pending";

@@ -49,18 +49,32 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
 
-  // If tied to a launch, the token's paired model wins (you fund THAT model).
+  // If tied to a launch, the agent's stored profile is authoritative: its model
+  // wins (you fund THAT model), its personality is injected as the system prompt
+  // (client-supplied system messages are dropped so the agent can't be
+  // re-scripted), and its temperature is applied.
   let model = parsed.model;
+  let messages = parsed.messages;
+  let temperature: number | undefined;
   if (parsed.token) {
     const link = await getLink(parsed.token);
-    if (link) model = link.model;
+    if (link) {
+      model = link.model;
+      temperature = link.temperature;
+      if (link.personality) {
+        messages = [
+          { role: "system" as const, content: link.personality },
+          ...parsed.messages.filter((m) => m.role !== "system"),
+        ];
+      }
+    }
   }
 
   // ── Streaming path ──────────────────────────────────────────────────────
   if (parsed.stream) {
     let upstream: Response;
     try {
-      upstream = await streamChat(model, parsed.messages);
+      upstream = await streamChat(model, messages, { temperature });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Chat failed.";
       return NextResponse.json({ error: message }, { status: 502 });
@@ -111,7 +125,7 @@ export async function POST(req: Request) {
 
   // ── Non-streaming path ──────────────────────────────────────────────────
   try {
-    const result = await chat(model, parsed.messages);
+    const result = await chat(model, messages, { temperature });
     if (parsed.token && result.costUsd > 0) {
       await addSpend(parsed.token, result.costUsd).catch(() => {});
     }

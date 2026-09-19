@@ -32,6 +32,9 @@ export async function GET() {
     txHash: string;
     model: string | null;
     modelName: string | null;
+    agentName: string | null;
+    ticker: string | null;
+    bio: string | null;
   }
 
   const seen = new Set<string>();
@@ -48,6 +51,9 @@ export async function GET() {
       txHash: l.txHash,
       model: link?.model ?? null,
       modelName: link?.modelName ?? null,
+      agentName: link?.agentName ?? null,
+      ticker: link?.ticker ?? null,
+      bio: link?.bio ?? null,
     };
   });
 
@@ -63,6 +69,9 @@ export async function GET() {
       txHash: l.txHash ?? "0x",
       model: l.model,
       modelName: l.modelName,
+      agentName: l.agentName ?? null,
+      ticker: l.ticker ?? null,
+      bio: l.bio ?? null,
     });
   }
 

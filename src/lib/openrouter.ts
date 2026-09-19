@@ -117,14 +117,19 @@ export interface ChatResult {
   model: string;
 }
 
+export interface ChatOptions {
+  /** Sampling temperature (0–2). Undefined uses the provider default. */
+  temperature?: number;
+}
+
 /** Spend compute: a single non-streaming chat completion via OpenRouter. */
-export async function chat(model: string, messages: ChatMessage[]): Promise<ChatResult> {
+export async function chat(model: string, messages: ChatMessage[], opts?: ChatOptions): Promise<ChatResult> {
   if (!hasKey()) throw new Error("NO_KEY");
 
   const res = await fetch(`${BASE}/chat/completions`, {
     method: "POST",
     headers: authHeaders(),
-    body: JSON.stringify({ model, messages, usage: { include: true } }),
+    body: JSON.stringify({ model, messages, temperature: opts?.temperature, usage: { include: true } }),
     cache: "no-store",
   });
 
@@ -159,12 +164,12 @@ export async function chat(model: string, messages: ChatMessage[]): Promise<Chat
  * final chunk carrying token usage + cost, which the route tees off to record
  * spend against the token's compute pool.
  */
-export async function streamChat(model: string, messages: ChatMessage[]): Promise<Response> {
+export async function streamChat(model: string, messages: ChatMessage[], opts?: ChatOptions): Promise<Response> {
   if (!hasKey()) throw new Error("NO_KEY");
   return fetch(`${BASE}/chat/completions`, {
     method: "POST",
     headers: authHeaders(),
-    body: JSON.stringify({ model, messages, stream: true, usage: { include: true } }),
+    body: JSON.stringify({ model, messages, temperature: opts?.temperature, stream: true, usage: { include: true } }),
     cache: "no-store",
   });
 }

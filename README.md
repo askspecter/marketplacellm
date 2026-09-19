@@ -1,10 +1,11 @@
-# LLMPad — every token funds a model 🧠⚡
+# Agentpad — launch autonomous AI agents 🧠⚡
 
-Launch an **ETH-paired token** on the **Pons v2** fair-launch bonding curve. Every
-trade pays a fee, and that fee becomes **OpenRouter compute** — anyone who
-launched can spend it talking to any of 400+ models. Inspired by the
-[llmtokens.fun](https://llmtokens.fun) mechanic (*“every token funds a model”*),
-built on the Pons v2 launch engine.
+An **agent-native launchpad** on Robinhood Chain. Every agent launches — in one
+transaction — with its own **token, personality, and model**. Trading generates
+fees; the fees fund a shared **compute pool**; the pool pays for the agent's
+**inference**. An ongoing source of intelligence, funded by the markets around
+it. In the spirit of [llmtokens.fun/agents](https://llmtokens.fun) (LLMOS),
+built on the **Pons v2** launch engine + **OpenRouter**.
 
 > Third-party interface to the Pons protocol on Robinhood Chain. Not affiliated
 > with Pons or OpenRouter. Non-custodial — your wallet signs every transaction.
@@ -13,12 +14,15 @@ built on the Pons v2 launch engine.
 ## How it works
 
 ```
-Pick an OpenRouter model
-      → Launch a token, paired with ETH  (Pons v2 launchToken → bonding curve)
-      → Trades accrue fees in ETH on the curve
-      → ETH fees ≈ OpenRouter credits for that model
-      → Launchers spend the compute: chat with the model the token funds
+Define the agent  — name, personality (system prompt), behavior (temperature)
+      → Choose a brain — any OpenRouter model (Claude, GPT, Llama, DeepSeek…)
+      → Launch — one Pons v2 tx deploys the token, paired with ETH
+      → Trades → fees → shared compute pool → inference
+      → The agent acts — chat with it now (its personality is authoritative);
+        it gains tools & autonomy over time
       → Curve fills → graduates to a locked Uniswap V4 pool
+
+trading → fees → compute → inference → agents
 ```
 
 ## Engine vs. new code
@@ -37,17 +41,19 @@ plus a new OpenRouter compute layer. The engine files are copied unchanged.
 
 ## Features
 
-- **Launch studio** — pick any OpenRouter model, deploy an ETH-paired Pons v2
-  token in one signed tx; the token→model link is registered automatically.
-- **Token page (live)** — bonding-curve price chart, graduation progress, a
-  buy/sell trade widget (curve math from the engine), and the compute pool’s
-  **Funded / Spent / Remaining**, all refreshing on an interval.
-- **Compute** — streaming chat against any model; on a token page it spends
-  that token’s pool and records the cost.
-- **Portfolio** — your launches (with model + compute spent) and on-chain
-  holdings across known tokens.
+- **Agent studio** — define name, ticker, bio, **personality (system prompt)**,
+  a **brain** (any OpenRouter model), and **behavior** (temperature); deploy the
+  ETH-paired Pons v2 token in one signed tx. The agent profile is registered
+  automatically and is first-write-wins (it can't be re-pointed later).
+- **Agent page (live)** — identity + brain + personality, bonding-curve price
+  chart, graduation progress, a buy/sell trade widget (curve math from the
+  engine), the compute pool’s **Funded / Spent / Remaining**, and a **chat with
+  the agent** whose system prompt + temperature are enforced server-side.
+- **Compute** — streaming chat against any model (free playground); on an agent
+  page it spends that agent’s pool and records the cost.
+- **Portfolio** — your agents (with brain + compute spent) and on-chain holdings.
 - **Treasury keeper** — `POST /api/treasury/sync` derives funded compute from
-  live curve state × ETH/USD and records it per token (the OpenRouter top-up
+  live curve state × ETH/USD and records it per agent (the OpenRouter top-up
   seam; gate it with `TREASURY_SECRET`).
 
 No UI or AI code from the reference launchpad was copied — only the on-chain

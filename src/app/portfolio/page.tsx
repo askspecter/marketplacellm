@@ -11,6 +11,8 @@ interface Launched {
   token: string;
   model: string;
   modelName: string;
+  agentName: string | null;
+  ticker: string | null;
   spendUsd: number;
 }
 interface Holding {
@@ -75,8 +77,11 @@ export default function PortfolioPage() {
                 {data.launched.map((l) => (
                   <Row key={l.token} href={`/token/${l.token}`}>
                     <div>
-                      <div className="font-medium text-white">{l.modelName}</div>
-                      <div className="font-mono text-xs text-white/40">{shortAddr(l.token)}</div>
+                      <div className="font-medium text-white">
+                        {l.agentName ?? l.modelName}
+                        {l.ticker ? <span className="ml-1 font-mono text-xs text-white/40">${l.ticker}</span> : null}
+                      </div>
+                      <div className="font-mono text-xs text-white/40">brain: {l.modelName} · {shortAddr(l.token)}</div>
                     </div>
                     <div className="text-right font-mono text-sm text-white/70">{usd(l.spendUsd)} spent</div>
                   </Row>

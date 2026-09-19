@@ -36,6 +36,8 @@ export async function GET(req: Request) {
       token: l.token,
       model: l.model,
       modelName: l.modelName,
+      agentName: l.agentName ?? null,
+      ticker: l.ticker ?? null,
       spendUsd: await getSpend(l.token).catch(() => 0),
     }))
   );

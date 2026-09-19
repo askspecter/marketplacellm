@@ -33,6 +33,12 @@ const PostBody = z.object({
   model: z.string().min(1),
   creator: z.string().optional(),
   txHash: z.string().optional(),
+  // Agent profile
+  agentName: z.string().max(64).optional(),
+  ticker: z.string().max(16).optional(),
+  bio: z.string().max(280).optional(),
+  personality: z.string().max(4000).optional(),
+  temperature: z.number().min(0).max(2).optional(),
 });
 
 /**
@@ -72,6 +78,11 @@ export async function POST(req: Request) {
     creator: body.creator,
     txHash: body.txHash,
     createdAt: Date.now(),
+    agentName: body.agentName,
+    ticker: body.ticker,
+    bio: body.bio,
+    personality: body.personality,
+    temperature: body.temperature,
   });
 
   return NextResponse.json({ ok: true });

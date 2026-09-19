@@ -9,21 +9,22 @@ export default function HomePage() {
         <div className="animate-rise">
           <span className="inline-flex items-center gap-2 rounded-full border border-bg-line bg-bg-panel px-3 py-1 text-xs font-medium text-cyan-soft">
             <span className="h-1.5 w-1.5 animate-pulseline rounded-full bg-cyan" />
-            Pons v2 bonding curve · powered by OpenRouter
+            Agent-native framework on Robinhood Chain
           </span>
           <h1 className="mt-5 text-4xl font-bold leading-[1.05] tracking-tight sm:text-6xl">
-            Every token <span className="text-gradient">funds a model.</span>
+            Launch <span className="text-gradient">autonomous agents.</span>
           </h1>
           <p className="mt-5 max-w-lg text-lg text-white/60">
-            Launch an ETH-paired token on the Pons v2 fair-launch curve. Every trade pays a fee — and that fee becomes
-            OpenRouter compute. Anyone who launched can spend it talking to any of 400+ models.
+            Every agent launches with its own token, personality, and model — in one transaction. Trading generates
+            fees; the fees fund a shared compute pool; the pool pays for inference. An ongoing source of intelligence,
+            funded by the markets around it.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/create"
               className="rounded-full bg-signature px-6 py-3 font-semibold text-black shadow-glow transition hover:brightness-110"
             >
-              Launch a token
+              Launch an agent
             </Link>
             <Link
               href="/compute"
@@ -34,16 +35,16 @@ export default function HomePage() {
           </div>
           <dl className="mt-10 flex gap-8 text-sm">
             <div>
-              <dt className="text-white/40">Pair asset</dt>
-              <dd className="mt-1 font-mono text-lg font-bold text-white">ETH</dd>
+              <dt className="text-white/40">Each agent</dt>
+              <dd className="mt-1 font-mono text-lg font-bold text-white">token + brain</dd>
             </div>
             <div>
               <dt className="text-white/40">Models</dt>
               <dd className="mt-1 font-mono text-lg font-bold text-white">400+</dd>
             </div>
             <div>
-              <dt className="text-white/40">Graduates to</dt>
-              <dd className="mt-1 font-mono text-lg font-bold text-white">Uniswap V4</dd>
+              <dt className="text-white/40">Pair asset</dt>
+              <dd className="mt-1 font-mono text-lg font-bold text-white">ETH</dd>
             </div>
           </dl>
         </div>
@@ -53,11 +54,11 @@ export default function HomePage() {
           <div className="text-xs uppercase tracking-widest text-white/40">The loop</div>
           <ol className="mt-4 space-y-3 font-mono text-sm">
             {[
-              ["01", "Pick a model", "Any OpenRouter model — Claude, GPT, Llama, DeepSeek…"],
-              ["02", "Launch, paired with ETH", "One tx deploys a Pons v2 bonding-curve token."],
-              ["03", "Trades pay fees", "Each buy/sell accrues a fee in ETH on the curve."],
-              ["04", "Fees → compute", "ETH fees fund OpenRouter credits for that model."],
-              ["05", "Spend compute", "Launchers chat with the model the token funds."],
+              ["01", "Define the agent", "Name, personality (system prompt), and behavior tuning."],
+              ["02", "Choose a brain", "Any OpenRouter model — Claude, GPT, Llama, DeepSeek…"],
+              ["03", "Launch with a token", "One tx deploys a Pons v2 bonding-curve token, paired with ETH."],
+              ["04", "Trades → fees → compute", "Fees fund the shared pool that pays for inference."],
+              ["05", "The agent acts", "Chat with it now; it gains tools & autonomy over time."],
             ].map(([n, t, d]) => (
               <li key={n} className="flex gap-3 rounded-lg border border-bg-line bg-bg-soft p-3">
                 <span className="text-gradient font-bold">{n}</span>
@@ -74,9 +75,9 @@ export default function HomePage() {
       {/* Feed */}
       <section id="feed" className="pb-24">
         <div className="mb-5 flex items-end justify-between">
-          <h2 className="text-2xl font-bold tracking-tight">Recent launches</h2>
+          <h2 className="text-2xl font-bold tracking-tight">Recent agents</h2>
           <Link href="/create" className="text-sm text-cyan-soft hover:text-cyan">
-            + New launch
+            + Launch agent
           </Link>
         </div>
         <LaunchFeed />
