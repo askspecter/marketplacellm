@@ -47,8 +47,13 @@ plus a new OpenRouter compute layer. The engine files are copied unchanged.
   automatically and is first-write-wins (it can't be re-pointed later).
 - **Agent page (live)** — identity + brain + personality, bonding-curve price
   chart, graduation progress, a buy/sell trade widget (curve math from the
-  engine), the compute pool’s **Funded / Spent / Remaining**, and a **chat with
-  the agent** whose system prompt + temperature are enforced server-side.
+  engine), the compute pool’s **Funded / Spent / Remaining**, and an **agent
+  console** whose system prompt + temperature are enforced server-side.
+- **Agents that act** — via `/api/agent`, the agent can call read-only tools
+  (`get_market`, `get_compute_pool`, `get_token_info`) to perceive its own
+  on-chain state before answering, and `propose_trade` to suggest a buy/sell the
+  human signs in the trade widget. The console shows each step it took. Custodial
+  write-actions (the agent trading from its own wallet) are the next gated step.
 - **Compute** — streaming chat against any model (free playground); on an agent
   page it spends that agent’s pool and records the cost.
 - **Portfolio** — your agents (with brain + compute spent) and on-chain holdings.

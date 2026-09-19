@@ -5,7 +5,7 @@ import Link from "next/link";
 import { isAddress } from "viem";
 import { TradeWidget, type CurveInputsSerialized } from "@/components/TradeWidget";
 import { PriceChart } from "@/components/PriceChart";
-import { Chat } from "@/components/Chat";
+import { AgentConsole } from "@/components/AgentConsole";
 import { shortAddr, usd } from "@/lib/format";
 
 interface TokenData {
@@ -218,8 +218,9 @@ export default function TokenPage({ params }: { params: { address: string } }) {
           )}
         </div>
 
-        {/* Right column: trade + chat */}
+        {/* Right column: trade + agent console */}
         <div className="space-y-6">
+          <div id="trade" />
           {serialized && data?.curveAddress ? (
             <TradeWidget
               curve={data.curveAddress as `0x${string}`}
@@ -236,7 +237,7 @@ export default function TokenPage({ params }: { params: { address: string } }) {
             </div>
           )}
 
-          {model && <Chat model={model.model} modelName={agentName} token={address} />}
+          {model && <AgentConsole token={address} agentName={agentName} />}
         </div>
       </div>
     </div>

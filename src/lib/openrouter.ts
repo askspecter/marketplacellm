@@ -174,6 +174,74 @@ export async function streamChat(model: string, messages: ChatMessage[], opts?: 
   });
 }
 
+// ── Tool calling (agentic loop) ─────────────────────────────────────────────
+
+export interface ToolCall {
+  id: string;
+  type: "function";
+  function: { name: string; arguments: string };
+}
+
+export interface RawMessage {
+  role: "system" | "user" | "assistant" | "tool";
+  content: string | null;
+  tool_calls?: ToolCall[];
+  tool_call_id?: string;
+  name?: string;
+}
+
+export interface ToolTurn {
+  message: RawMessage;
+  usage: { promptTokens: number; completionTokens: number; totalTokens: number };
+  costUsd: number;
+}
+
+/**
+ * One model turn that may request tool calls. The caller runs the loop:
+ * execute any tool_calls, append the results as role:"tool" messages, and call
+ * again until the model returns a message with no tool_calls.
+ */
+export async function chatWithTools(
+  model: string,
+  messages: RawMessage[],
+  tools: unknown[],
+  opts?: ChatOptions
+): Promise<ToolTurn> {
+  if (!hasKey()) throw new Error("NO_KEY");
+  const res = await fetch(`${BASE}/chat/completions`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify({
+      model,
+      messages,
+      tools,
+      tool_choice: "auto",
+      temperature: opts?.temperature,
+      usage: { include: true },
+    }),
+    cache: "no-store",
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`OpenRouter tools ${res.status}: ${text.slice(0, 300)}`);
+  }
+  const json = (await res.json()) as {
+    choices?: { message?: RawMessage }[];
+    usage?: { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number; cost?: number };
+  };
+  const message = json.choices?.[0]?.message ?? { role: "assistant", content: "" };
+  const u = json.usage ?? {};
+  return {
+    message,
+    usage: {
+      promptTokens: u.prompt_tokens ?? 0,
+      completionTokens: u.completion_tokens ?? 0,
+      totalTokens: u.total_tokens ?? 0,
+    },
+    costUsd: u.cost ?? 0,
+  };
+}
+
 /** Live OpenRouter credit balance for the configured key (funded compute). */
 export async function fetchCredits(): Promise<{ totalCredits: number; totalUsage: number; remaining: number } | null> {
   if (!hasKey()) return null;
