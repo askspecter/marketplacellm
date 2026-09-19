@@ -153,6 +153,22 @@ export async function chat(model: string, messages: ChatMessage[]): Promise<Chat
   };
 }
 
+/**
+ * Streaming chat: returns the upstream OpenRouter SSE Response so a route can
+ * pipe it straight to the browser. With `usage.include`, OpenRouter emits a
+ * final chunk carrying token usage + cost, which the route tees off to record
+ * spend against the token's compute pool.
+ */
+export async function streamChat(model: string, messages: ChatMessage[]): Promise<Response> {
+  if (!hasKey()) throw new Error("NO_KEY");
+  return fetch(`${BASE}/chat/completions`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify({ model, messages, stream: true, usage: { include: true } }),
+    cache: "no-store",
+  });
+}
+
 /** Live OpenRouter credit balance for the configured key (funded compute). */
 export async function fetchCredits(): Promise<{ totalCredits: number; totalUsage: number; remaining: number } | null> {
   if (!hasKey()) return null;

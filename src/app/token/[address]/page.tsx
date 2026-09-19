@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { isAddress } from "viem";
 import { TradeWidget, type CurveInputsSerialized } from "@/components/TradeWidget";
+import { PriceChart } from "@/components/PriceChart";
 import { Chat } from "@/components/Chat";
 import { shortAddr, usd } from "@/lib/format";
 
@@ -117,6 +118,9 @@ export default function TokenPage({ params }: { params: { address: string } }) {
           </div>
 
           {data?.description && <p className="text-white/70">{data.description}</p>}
+
+          {/* Price chart */}
+          <PriceChart token={address} quoteSymbol={isNative ? "ETH" : "quote"} />
 
           {/* Curve progress */}
           {curve && !curve.graduated && (

@@ -14,6 +14,10 @@ export function Chat({ model, modelName, token }: { model: string; modelName?: s
   const [notice, setNotice] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  function scrollDown() {
+    requestAnimationFrame(() => scrollRef.current?.scrollTo({ top: 1e9 }));
+  }
+
   async function send() {
     const text = input.trim();
     if (!text || busy || !model) return;
@@ -26,18 +30,53 @@ export function Chat({ model, modelName, token }: { model: string; modelName?: s
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ model, token, messages: next }),
+        body: JSON.stringify({ model, token, messages: next, stream: true }),
       });
-      const data = await res.json();
-      if (!res.ok) {
+
+      // Errors (503 no key, 502 upstream) come back as JSON, not a stream.
+      const ct = res.headers.get("content-type") ?? "";
+      if (!res.ok || !ct.includes("text/event-stream") || !res.body) {
+        const data = await res.json().catch(() => ({}));
         setNotice(data.error ?? "Chat failed.");
-        setMessages(messages); // roll back the optimistic user msg context
+        setMessages(messages); // roll back optimistic context
         return;
       }
-      setMessages([...next, { role: "assistant", content: data.content || "(empty response)" }]);
-      requestAnimationFrame(() => scrollRef.current?.scrollTo({ top: 1e9, behavior: "smooth" }));
+
+      // Open an empty assistant bubble and fill it as tokens arrive.
+      setMessages([...next, { role: "assistant", content: "" }]);
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = "";
+      let acc = "";
+
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        let nl: number;
+        while ((nl = buf.indexOf("\n")) !== -1) {
+          const line = buf.slice(0, nl).trim();
+          buf = buf.slice(nl + 1);
+          if (!line.startsWith("data:")) continue;
+          const data = line.slice(5).trim();
+          if (data === "[DONE]" || !data) continue;
+          try {
+            const json = JSON.parse(data) as { choices?: { delta?: { content?: string } }[] };
+            const piece = json.choices?.[0]?.delta?.content;
+            if (piece) {
+              acc += piece;
+              setMessages([...next, { role: "assistant", content: acc }]);
+              scrollDown();
+            }
+          } catch {
+            /* keepalive / partial line */
+          }
+        }
+      }
+      if (!acc) setMessages([...next, { role: "assistant", content: "(empty response)" }]);
     } catch {
       setNotice("Network error talking to compute.");
+      setMessages(messages);
     } finally {
       setBusy(false);
     }
