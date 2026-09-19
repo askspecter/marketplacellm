@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { timingSafeEqual } from "node:crypto";
 import { zeroAddress, type Address } from "viem";
 import { getCurveState, getLaunchedTokenV2 } from "@/lib/pons/readerV2";
 import { fundedComputeUsd, getLink, listLinks, setCredited } from "@/lib/pool";
@@ -22,8 +23,12 @@ export const dynamic = "force-dynamic";
  */
 export async function POST(req: Request) {
   const secret = process.env.TREASURY_SECRET?.trim();
-  if (secret && req.headers.get("x-treasury-secret") !== secret) {
-    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  if (secret) {
+    const provided = req.headers.get("x-treasury-secret") ?? "";
+    const a = Buffer.from(provided);
+    const b = Buffer.from(secret);
+    const ok = a.length === b.length && timingSafeEqual(a, b);
+    if (!ok) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
   let only: string | undefined;

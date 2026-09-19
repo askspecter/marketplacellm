@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAddress } from "viem";
 import { z } from "zod";
-import { fetchCredits, findModel } from "@/lib/openrouter";
+import { findModel } from "@/lib/openrouter";
 import { getCredited, getLink, getSpend, listLinks, saveLink } from "@/lib/pool";
 
 export const runtime = "nodejs";
@@ -21,8 +21,10 @@ export async function GET(req: Request) {
     return NextResponse.json({ link, spendUsd: spend, creditedUsd: credited, remainingUsd: Math.max(0, credited - spend) });
   }
 
-  const [links, credits] = await Promise.all([listLinks(), fetchCredits()]);
-  return NextResponse.json({ links, credits });
+  // Note: we intentionally do NOT expose the platform's OpenRouter account
+  // balance here — that is private treasury state, not public pool data.
+  const links = await listLinks();
+  return NextResponse.json({ links });
 }
 
 const PostBody = z.object({
@@ -48,6 +50,17 @@ export async function POST(req: Request) {
 
   const model = await findModel(body.model);
   if (!model) return NextResponse.json({ error: "Unknown OpenRouter model id." }, { status: 400 });
+
+  // First-write-wins: a token's model link is set once at launch and cannot be
+  // re-pointed by a later caller (which would let anyone hijack an existing
+  // token's compute pool). Re-registering the SAME model is a no-op success.
+  const existing = await getLink(body.token);
+  if (existing) {
+    if (existing.model !== model.id) {
+      return NextResponse.json({ error: "This token is already linked to a model." }, { status: 409 });
+    }
+    return NextResponse.json({ ok: true, alreadyLinked: true });
+  }
 
   await saveLink({
     token: body.token,

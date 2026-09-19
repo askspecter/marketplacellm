@@ -6,17 +6,25 @@ import { addSpend, getLink } from "@/lib/pool";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const Body = z.object({
-  model: z.string().min(1),
-  messages: z
-    .array(z.object({ role: z.enum(["system", "user", "assistant"]), content: z.string() }))
-    .min(1)
-    .max(40),
-  /** Optional: the launch token whose compute pool this spend belongs to. */
-  token: z.string().optional(),
-  /** Stream Server-Sent Events instead of a single JSON response. */
-  stream: z.boolean().optional(),
-});
+// Cap total input so an open compute endpoint can't be used to burn the
+// platform's OpenRouter credits with giant prompts.
+const MAX_TOTAL_CHARS = 24_000;
+
+const Body = z
+  .object({
+    model: z.string().min(1).max(128),
+    messages: z
+      .array(z.object({ role: z.enum(["system", "user", "assistant"]), content: z.string().max(MAX_TOTAL_CHARS) }))
+      .min(1)
+      .max(40),
+    /** Optional: the launch token whose compute pool this spend belongs to. */
+    token: z.string().optional(),
+    /** Stream Server-Sent Events instead of a single JSON response. */
+    stream: z.boolean().optional(),
+  })
+  .refine((b) => b.messages.reduce((n, m) => n + m.content.length, 0) <= MAX_TOTAL_CHARS, {
+    message: `Conversation exceeds the ${MAX_TOTAL_CHARS}-character input limit.`,
+  });
 
 /**
  * POST /api/chat  { model, messages, token?, stream? }

@@ -30,10 +30,25 @@ plus a new OpenRouter compute layer. The engine files are copied unchanged.
 |---|---|---|
 | `src/lib/chain.ts`, `src/lib/pons/*`, `src/lib/kv.ts` | **engine (reused)** | Robinhood Chain, Pons v1/v2 adapters, verified ABIs, on-chain readers, bonding-curve math |
 | `src/app/api/v2/*` | **engine (reused)** | Live v2 launch-options, token state, and chart endpoints |
-| `src/lib/openrouter.ts` | **new** | OpenRouter “Any LLM” layer — public model catalog + authenticated chat/credits |
-| `src/lib/pool.ts` | **new** | Compute-pool accounting: token→model link + fees→compute |
-| `src/app/api/{models,chat,pool,launches}` | **new** | Catalog, spend-compute, pool registry, annotated feed |
-| `src/app/*`, `src/components/*` | **new** | Landing, launch studio, token page, compute playground, wallet |
+| `src/lib/openrouter.ts` | **new** | OpenRouter “Any LLM” layer — public model catalog + authenticated chat (streaming) + credits |
+| `src/lib/pool.ts`, `src/lib/eth.ts` | **new** | Compute-pool accounting: token→model link, spend + credited tracking, ETH/USD |
+| `src/app/api/{models,chat,pool,launches,portfolio,treasury/sync}` | **new** | Catalog, spend-compute (SSE), pool registry, feed, portfolio, treasury keeper |
+| `src/app/*`, `src/components/*` | **new** | Landing, launch studio, token page (live), compute playground, portfolio, wallet |
+
+## Features
+
+- **Launch studio** — pick any OpenRouter model, deploy an ETH-paired Pons v2
+  token in one signed tx; the token→model link is registered automatically.
+- **Token page (live)** — bonding-curve price chart, graduation progress, a
+  buy/sell trade widget (curve math from the engine), and the compute pool’s
+  **Funded / Spent / Remaining**, all refreshing on an interval.
+- **Compute** — streaming chat against any model; on a token page it spends
+  that token’s pool and records the cost.
+- **Portfolio** — your launches (with model + compute spent) and on-chain
+  holdings across known tokens.
+- **Treasury keeper** — `POST /api/treasury/sync` derives funded compute from
+  live curve state × ETH/USD and records it per token (the OpenRouter top-up
+  seam; gate it with `TREASURY_SECRET`).
 
 No UI or AI code from the reference launchpad was copied — only the on-chain
 engine.
