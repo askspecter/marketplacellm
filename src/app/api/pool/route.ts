@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { isAddress } from "viem";
 import { z } from "zod";
 import { fetchCredits, findModel } from "@/lib/openrouter";
-import { getLink, getSpend, listLinks, saveLink } from "@/lib/pool";
+import { getCredited, getLink, getSpend, listLinks, saveLink } from "@/lib/pool";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -17,8 +17,8 @@ export async function GET(req: Request) {
 
   if (token) {
     if (!isAddress(token)) return NextResponse.json({ error: "Invalid token address." }, { status: 400 });
-    const [link, spend] = await Promise.all([getLink(token), getSpend(token)]);
-    return NextResponse.json({ link, spendUsd: spend });
+    const [link, spend, credited] = await Promise.all([getLink(token), getSpend(token), getCredited(token)]);
+    return NextResponse.json({ link, spendUsd: spend, creditedUsd: credited, remainingUsd: Math.max(0, credited - spend) });
   }
 
   const [links, credits] = await Promise.all([listLinks(), fetchCredits()]);

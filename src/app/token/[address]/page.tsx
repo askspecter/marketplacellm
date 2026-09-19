@@ -38,6 +38,8 @@ interface TokenData {
 interface PoolData {
   link: { model: string; modelName: string; promptPerM: number; completionPerM: number } | null;
   spendUsd: number;
+  creditedUsd: number;
+  remainingUsd: number;
 }
 
 export default function TokenPage({ params }: { params: { address: string } }) {
@@ -52,19 +54,27 @@ export default function TokenPage({ params }: { params: { address: string } }) {
       return;
     }
     let alive = true;
-    Promise.all([
-      fetch(`/api/v2/token?address=${address}`).then((r) => r.json()),
-      fetch(`/api/pool?token=${address}`).then((r) => r.json()),
-    ])
-      .then(([t, p]) => {
-        if (!alive) return;
-        setData(t);
-        setPool(p);
-      })
-      .catch(() => {})
-      .finally(() => alive && setLoading(false));
+    const load = () =>
+      Promise.all([
+        fetch(`/api/v2/token?address=${address}`).then((r) => r.json()),
+        fetch(`/api/pool?token=${address}`).then((r) => r.json()),
+      ])
+        .then(([t, p]) => {
+          if (!alive) return;
+          setData(t);
+          setPool(p);
+        })
+        .catch(() => {})
+        .finally(() => alive && setLoading(false));
+
+    load();
+    // Live: refresh curve state + pool every 12s (pauses in a hidden tab).
+    const id = setInterval(() => {
+      if (!document.hidden) load();
+    }, 12_000);
     return () => {
       alive = false;
+      clearInterval(id);
     };
   }, [address]);
 
@@ -143,16 +153,17 @@ export default function TokenPage({ params }: { params: { address: string } }) {
               <>
                 <div className="mt-2 text-lg font-semibold text-white">Funds {model.modelName}</div>
                 <div className="font-mono text-xs text-white/50">{model.model}</div>
-                <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-                  <Stat label="Compute spent" value={usd(pool?.spendUsd ?? 0)} />
-                  <Stat
-                    label="Fees generated"
-                    value={
-                      curve
-                        ? `${((Number(curve.realQuoteReserve) / 1e18) * (Number(curve.feeBps) / 10000)).toFixed(5)} ETH`
-                        : "—"
-                    }
-                  />
+                <div className="mt-4 grid grid-cols-3 gap-3 text-sm">
+                  <Stat label="Funded" value={usd(pool?.creditedUsd ?? 0)} />
+                  <Stat label="Spent" value={usd(pool?.spendUsd ?? 0)} />
+                  <Stat label="Remaining" value={usd(pool?.remainingUsd ?? 0)} />
+                </div>
+                <div className="mt-2 text-xs text-white/40">
+                  Fees generated:{" "}
+                  {curve
+                    ? `${((Number(curve.realQuoteReserve) / 1e18) * (Number(curve.feeBps) / 10000)).toFixed(5)} ETH`
+                    : "—"}{" "}
+                  · funded compute is topped up to OpenRouter by the treasury keeper.
                 </div>
               </>
             ) : (

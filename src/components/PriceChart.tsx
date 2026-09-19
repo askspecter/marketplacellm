@@ -10,26 +10,41 @@ interface Point {
 }
 
 /** Bonding-curve price history for a v2 token, from the engine chart endpoint. */
-export function PriceChart({ token, quoteSymbol = "ETH" }: { token: string; quoteSymbol?: string }) {
+export function PriceChart({
+  token,
+  quoteSymbol = "ETH",
+  refreshMs = 20_000,
+}: {
+  token: string;
+  quoteSymbol?: string;
+  refreshMs?: number;
+}) {
   const [points, setPoints] = useState<Point[] | null>(null);
   const [usdMode, setUsdMode] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     let alive = true;
-    fetch(`/api/v2/token/chart?address=${token}`)
-      .then((r) => r.json())
-      .then((d) => {
-        if (!alive) return;
-        const pts: Point[] = d.points ?? [];
-        setPoints(pts);
-        setUsdMode(pts.some((p) => p.priceUsd != null));
-      })
-      .catch(() => alive && setPoints([]));
+    const load = () =>
+      fetch(`/api/v2/token/chart?address=${token}`)
+        .then((r) => r.json())
+        .then((d) => {
+          if (!alive) return;
+          const pts: Point[] = d.points ?? [];
+          setPoints(pts);
+          setUsdMode(pts.some((p) => p.priceUsd != null));
+        })
+        .catch(() => alive && setPoints((prev) => prev ?? []));
+
+    load();
+    const id = setInterval(() => {
+      if (!document.hidden) load();
+    }, refreshMs);
     return () => {
       alive = false;
+      clearInterval(id);
     };
-  }, [token]);
+  }, [token, refreshMs]);
 
   useEffect(() => {
     const canvas = canvasRef.current;

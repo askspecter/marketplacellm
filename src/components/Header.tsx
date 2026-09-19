@@ -18,6 +18,7 @@ export function Header() {
           <Link href="/create" className="transition hover:text-white">Launch</Link>
           <Link href="/#feed" className="transition hover:text-white">Feed</Link>
           <Link href="/compute" className="transition hover:text-white">Compute</Link>
+          <Link href="/portfolio" className="transition hover:text-white">Portfolio</Link>
         </nav>
 
         <div className="ml-auto">

@@ -31,12 +31,14 @@ export interface LaunchLink {
 const KEY_LINK = (token: string) => `llmpad:link:${token.toLowerCase()}`;
 const KEY_INDEX = "llmpad:links";
 const KEY_SPEND = (token: string) => `llmpad:spend:${token.toLowerCase()}`;
+const KEY_CREDIT = (token: string) => `llmpad:credit:${token.toLowerCase()}`;
 
 // In-process fallback (resets on redeploy; fine for local/dev).
 const mem = {
   links: new Map<string, LaunchLink>(),
   index: new Set<string>(),
   spend: new Map<string, number>(),
+  credit: new Map<string, number>(),
 };
 
 export async function saveLink(link: LaunchLink): Promise<void> {
@@ -81,6 +83,28 @@ export async function addSpend(token: string, usd: number): Promise<number> {
   if (kv) return (await kv.incrbyfloat(KEY_SPEND(key), usd)) as number;
   const next = (mem.spend.get(key) ?? 0) + usd;
   mem.spend.set(key, next);
+  return next;
+}
+
+/**
+ * Credited compute (USD) — the amount the treasury keeper has recorded as
+ * topped-up to OpenRouter for this token. Monotonic: the keeper sets the latest
+ * funded total, and we never lower it (a top-up already happened).
+ */
+export async function getCredited(token: string): Promise<number> {
+  const key = token.toLowerCase();
+  const kv = getKv();
+  if (kv) return (await kv.get<number>(KEY_CREDIT(key))) ?? 0;
+  return mem.credit.get(key) ?? 0;
+}
+
+export async function setCredited(token: string, usd: number): Promise<number> {
+  const key = token.toLowerCase();
+  const current = await getCredited(key);
+  const next = Math.max(current, usd);
+  const kv = getKv();
+  if (kv) await kv.set(KEY_CREDIT(key), next);
+  else mem.credit.set(key, next);
   return next;
 }
 
