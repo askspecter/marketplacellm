@@ -96,5 +96,11 @@ export async function GET() {
     })
   );
 
-  return NextResponse.json({ count: feed.length, launches: feed });
+  // Only show agents that have a real identity image, OR that were launched
+  // through Neuma (they carry a model link). This hides foreign Pons tokens with
+  // no image of their own, whose card would otherwise fall back to rendering a
+  // bare AI-model logo as the token art.
+  const launches = feed.filter((it) => Boolean(it.logo) || Boolean(it.model));
+
+  return NextResponse.json({ count: launches.length, launches });
 }
