@@ -83,9 +83,20 @@ function Grid({ children }: { children: React.ReactNode }) {
   return <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>{children}</div>;
 }
 
+function initials(s?: string | null): string {
+  return (s || "?").replace(/[^a-zA-Z0-9]/g, "").slice(0, 2).toUpperCase() || "?";
+}
+function hashHsl(s: string): string {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360;
+  return `hsl(${h}, 48%, 40%)`;
+}
+
 function AgentCard({ it }: { it: Item }) {
   const p = providerFromId(it.model ?? undefined);
   const hasModel = !!it.model;
+  const [imgOk, setImgOk] = useState(true);
+  const mono = initials(it.ticker ?? it.agentName);
   return (
     <Link href={`/token/${it.token}`} className="card" style={{ overflow: "hidden", display: "block" }}>
       {/* Art */}
@@ -94,11 +105,13 @@ function AgentCard({ it }: { it: Item }) {
           <RhBadge />
           {hasModel && <span className="badge">{p.name}</span>}
         </div>
-        {it.logo ? (
+        {it.logo && imgOk ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={it.logo} alt="" style={{ width: "56%", aspectRatio: "1", borderRadius: 24, objectFit: "cover" }} onError={(e) => ((e.currentTarget.style.display = "none"))} />
+          <img src={it.logo} alt="" style={{ width: "62%", aspectRatio: "1", borderRadius: 22, objectFit: "cover" }} onError={() => setImgOk(false)} />
+        ) : hasModel ? (
+          <ModelLogo model={it.model ?? undefined} size={118} radius={26} />
         ) : (
-          <ModelLogo model={it.model ?? undefined} size={116} radius={26} />
+          <div style={{ width: "56%", aspectRatio: "1", borderRadius: 22, background: hashHsl(mono), display: "grid", placeItems: "center", color: "#fff", fontWeight: 800, fontSize: 40 }}>{mono}</div>
         )}
         <span style={{ position: "absolute", bottom: 12, left: 12 }} className="badge">fees → compute</span>
       </div>
