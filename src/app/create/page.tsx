@@ -121,23 +121,52 @@ export default function CreatePage() {
         <span className="mono" style={{ fontSize: 12, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--mut)" }}>● Live preview</span>
         <span style={{ fontSize: 12.5, color: "var(--dim)" }}>how it shows on Explore</span>
       </div>
-      <div className="card" style={{ overflow: "hidden", maxWidth: 320 }}>
-        <div style={{ position: "relative", aspectRatio: "1.35 / 1", background: `radial-gradient(120% 120% at 30% 20%, ${providerFromId(model?.id).color}44, transparent 60%), var(--card-2)`, display: "grid", placeItems: "center", borderBottom: "1px solid var(--border)" }}>
-          <span style={{ position: "absolute", top: 12, left: 12 }} className="badge"><span className="dot" style={{ background: "#7fd18f", color: "#04140e" }}>◗</span> RH</span>
+
+      <div className="card" style={{ overflow: "hidden" }}>
+        {/* Art */}
+        <div style={{ position: "relative", aspectRatio: "1.6 / 1", background: `radial-gradient(120% 120% at 30% 20%, ${providerFromId(model?.id).color}44, transparent 60%), var(--card-2)`, display: "grid", placeItems: "center", borderBottom: "1px solid var(--border)" }}>
+          <span style={{ position: "absolute", top: 12, left: 12 }} className="badge">ETH</span>
           {image ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={image} alt="" style={{ width: 92, height: 92, borderRadius: 22, objectFit: "cover" }} />
-          ) : <ModelLogo model={model?.id} size={92} radius={22} />}
+            <img src={image} alt="" style={{ width: 120, height: 120, borderRadius: 26, objectFit: "cover" }} />
+          ) : model ? <ModelLogo model={model.id} size={120} radius={26} /> : (
+            <span style={{ fontSize: 56, color: "var(--dim)", fontWeight: 700 }}>?</span>
+          )}
           <span style={{ position: "absolute", bottom: 12, left: 12 }} className="badge">fees → compute</span>
         </div>
-        <div style={{ padding: 16 }}>
-          <div className="flex items-baseline justify-between gap-2">
-            <span style={{ fontWeight: 700, fontSize: 18 }}>{name || "Your agent"}</span>
-            <span className="mono" style={{ color: "var(--dim)", fontSize: 13 }}>${ticker.toUpperCase() || "TICKER"}</span>
+        {/* Meta row */}
+        <div style={{ padding: 18 }}>
+          <div style={{ fontWeight: 700, fontSize: 20 }}>{name || "Your agent"}</div>
+          <div className="mono" style={{ color: "var(--dim)", fontSize: 14, marginTop: 2 }}>${ticker.toUpperCase() || "TICKER"}</div>
+          <div className="flex items-baseline justify-between" style={{ marginTop: 14 }}>
+            <span className="num" style={{ fontSize: 22, fontWeight: 700 }}>$3,502<span style={{ fontSize: 13, color: "var(--dim)", fontWeight: 500 }}> starting MC</span></span>
+            <span className="num" style={{ color: "var(--dim)", fontSize: 14 }}>$0 vol</span>
           </div>
-          <div className="mono" style={{ marginTop: 6, color: "var(--mut)", fontSize: 13 }}>{model?.name ?? "— pick a brain —"}</div>
+          <div className="mono flex items-center justify-between" style={{ marginTop: 10, fontSize: 13, color: "var(--dim)" }}>
+            <span>0x0000…0000</span><span style={{ color: "var(--cream)" }}>now</span>
+          </div>
         </div>
       </div>
+
+      {/* Summary table */}
+      <div className="card" style={{ padding: 18, marginTop: 12 }}>
+        <PRow k="Network" v="Robinhood Chain" />
+        <PRow k="Paired with" v="ETH" />
+        <PRow k="Brain" v={model ? `${providerFromId(model.id).name} · ${model.name}` : "—"} />
+        <PRow k="Starting market cap" v="≈ $3,502 · set by curve" />
+        <PRow k="Pool fee" v="1.0% base + 2% → compute pool" />
+        <PRow k="Your fees go" v="→ compute pool (funds inference)" />
+        <PRow k="Supply" v="1,000,000,000 · fair launch" />
+      </div>
+    </div>
+  );
+}
+
+function PRow({ k, v }: { k: string; v: string }) {
+  return (
+    <div className="flex items-center justify-between gap-4" style={{ padding: "9px 0", fontSize: 14 }}>
+      <span style={{ color: "var(--mut)" }}>{k}</span>
+      <span className="mono" style={{ textAlign: "right" }}>{v}</span>
     </div>
   );
 }
