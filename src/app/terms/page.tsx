@@ -52,8 +52,8 @@ export default function TermsPage() {
         <h2>4. No financial advice</h2>
         <p>
           Nothing on {SITE.name} is financial, investment, legal, or tax advice. Information and figures shown in
-          the interface — including prices, market caps, and &ldquo;funded compute&rdquo; — may be estimates or
-          simulated and can be inaccurate or out of date. You are solely responsible for your own decisions.
+          the interface — including prices, market caps, and &ldquo;funded compute&rdquo; — are estimates and can be
+          inaccurate or out of date. You are solely responsible for your own decisions.
         </p>
       </section>
 

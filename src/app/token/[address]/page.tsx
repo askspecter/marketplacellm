@@ -159,7 +159,7 @@ export default function AgentPage({ params }: { params: { address: string } }) {
             <Detail k="Compute funded" v={usd(pool?.creditedUsd ?? 0)} />
           </div>
 
-          <p className="notice">This is a demo interface. Agents, markets and compute figures may be simulated; tokens can be volatile or lose all value. You sign every transaction — {"Neuma"} does not custody assets or give financial advice.</p>
+          <p className="notice">Live on Robinhood Chain — you sign every transaction and Neuma never custodies your assets. Tokens can be volatile and may lose all value; prices and compute figures are estimates. Nothing here is financial advice.</p>
         </div>
 
         {/* Right */}
