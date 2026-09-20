@@ -64,7 +64,7 @@ export default function AgentPage({ params }: { params: { address: string } }) {
         {/* Left */}
         <div className="flex flex-col gap-4">
           {/* Header */}
-          <div className="card" style={{ padding: 20 }}>
+          <div className="card" style={{ padding: 15 }}>
             <div className="flex items-center gap-4">
               <ModelLogo model={model?.model} size={56} radius={16} />
               <div style={{ minWidth: 0, flex: 1 }}>
@@ -86,21 +86,21 @@ export default function AgentPage({ params }: { params: { address: string } }) {
 
           {/* Price + funded */}
           <div className="duo">
-            <div className="card-2" style={{ padding: 18 }}>
+            <div className="card-2" style={{ padding: 15 }}>
               <div style={{ fontSize: 13, color: "var(--mut)" }}>Price</div>
               <div className="num" style={{ fontSize: 24, fontWeight: 700, marginTop: 6 }}>{curve ? `${curve.spotPrice.toPrecision(4)}` : "—"}<span style={{ fontSize: 13, color: "var(--dim)" }}> ETH</span></div>
             </div>
-            <div className="card-2" style={{ padding: 18 }}>
+            <div className="card-2" style={{ padding: 15 }}>
               <div style={{ fontSize: 13, color: "var(--mut)" }}>Compute funded</div>
               <div className="num" style={{ fontSize: 24, fontWeight: 700, marginTop: 6, color: "var(--cream)" }}>{usd(pool?.creditedUsd ?? 0)}</div>
             </div>
           </div>
 
-          <div className="card" style={{ padding: 18 }}><PriceChart token={address} quoteSymbol={isNative ? "ETH" : "quote"} /></div>
+          <div className="card" style={{ padding: 15 }}><PriceChart token={address} quoteSymbol={isNative ? "ETH" : "quote"} /></div>
 
           {/* Curve progress */}
           {curve && !curve.graduated && (
-            <div className="card-2" style={{ padding: 18 }}>
+            <div className="card-2" style={{ padding: 15 }}>
               <div className="flex justify-between" style={{ fontSize: 14 }}><span style={{ color: "var(--mut)" }}>Bonding-curve progress</span><span className="num" style={{ color: "var(--cream)" }}>{progressPct}%</span></div>
               <div style={{ marginTop: 10, height: 8, borderRadius: 999, background: "var(--bg-soft)", overflow: "hidden" }}>
                 <div style={{ height: "100%", width: `${progressPct}%`, background: "var(--cream)", borderRadius: 999 }} />
@@ -111,7 +111,7 @@ export default function AgentPage({ params }: { params: { address: string } }) {
 
           {/* About */}
           {(bio || model?.personality) && (
-            <div className="card" style={{ padding: 18 }}>
+            <div className="card" style={{ padding: 15 }}>
               <div style={{ fontWeight: 600, marginBottom: 8 }}>About</div>
               {bio && <p style={{ color: "var(--mut)", fontSize: 14, lineHeight: 1.6 }}>{bio}</p>}
               {model?.personality && (
@@ -124,7 +124,7 @@ export default function AgentPage({ params }: { params: { address: string } }) {
           )}
 
           {/* Details */}
-          <div className="card" style={{ padding: 18 }}>
+          <div className="card" style={{ padding: 15 }}>
             <div style={{ fontWeight: 600, marginBottom: 12 }}>Details</div>
             <Detail k="Contract" v={shortAddr(address)} />
             <Detail k="Bonding curve" v={shortAddr(data?.curveAddress ?? "")} />
@@ -147,7 +147,7 @@ export default function AgentPage({ params }: { params: { address: string } }) {
           )}
 
           {/* Compute pool */}
-          <div className="card" style={{ padding: 18 }}>
+          <div className="card" style={{ padding: 15 }}>
             <div className="flex items-center justify-between"><span style={{ fontWeight: 600 }}>Compute pool</span><span className="badge">fees → inference</span></div>
             <div className="grid gap-2" style={{ gridTemplateColumns: "1fr 1fr 1fr", marginTop: 14 }}>
               <Stat label="Funded" value={usd(pool?.creditedUsd ?? 0)} />

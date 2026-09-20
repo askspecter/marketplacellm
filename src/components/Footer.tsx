@@ -15,42 +15,35 @@ const LEGAL: [string, string][] = [
 
 export function Footer() {
   return (
-    <div className="wrap" style={{ paddingTop: 24, paddingBottom: 40 }}>
-      <footer className="card" style={{ padding: 32 }}>
-        <div style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: 40, lineHeight: 1, letterSpacing: "-.01em" }}>{SITE.name.toLowerCase()}</div>
-        <p style={{ marginTop: 18, maxWidth: "52ch", color: "var(--mut)", fontSize: 15.5, lineHeight: 1.6 }}>
-          Launch and explore autonomous agents on Robinhood Chain, each paired with ETH and powered by an OpenRouter
-          model. Your wallet submits every transaction. {SITE.name} does not custody assets.
+    <div className="wrap" style={{ paddingTop: 20, paddingBottom: 28 }}>
+      <footer className="card" style={{ padding: 24 }}>
+        <div className="flex items-center gap-2.5">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/neuma.png" alt="Neuma" width={28} height={28} style={{ borderRadius: 8, border: "1px solid var(--border)", display: "block" }} />
+          <span style={{ fontWeight: 700, fontSize: 18 }}>{SITE.name}</span>
+        </div>
+        <p style={{ marginTop: 12, maxWidth: "56ch", color: "var(--mut)", fontSize: 14, lineHeight: 1.55 }}>
+          Autonomous agents on Robinhood Chain, paired with ETH and powered by an OpenRouter model. Your wallet submits
+          every transaction. {SITE.name} does not custody assets.
         </p>
 
-        <FSection title="Product">
-          {PRODUCT.map(([l, h]) => (
-            <Link key={l} href={h} style={{ color: "var(--text)", fontSize: 17 }} className="hover:opacity-70">{l}</Link>
-          ))}
-        </FSection>
-
-        <FSection title="Legal">
-          {LEGAL.map(([l, h]) => (
-            <Link key={l} href={h} style={{ color: "var(--text)", fontSize: 17 }} className="hover:opacity-70">{l}</Link>
-          ))}
-        </FSection>
-
-        <div style={{ marginTop: 34 }}>
-          <div style={{ color: "var(--dim)", fontSize: 14, marginBottom: 12 }}>Risk notice</div>
-          <p style={{ maxWidth: "62ch", color: "var(--mut)", fontSize: 15, lineHeight: 1.6 }}>
-            Transactions are submitted through your wallet and may be irreversible. Tokens can be volatile or lose all
-            value. {SITE.name} does not provide custody, warranties, or financial advice.
-          </p>
+        <div className="flex flex-wrap" style={{ gap: 40, marginTop: 22 }}>
+          <FSection title="Product">
+            {PRODUCT.map(([l, h]) => (<Link key={l} href={h} style={{ color: "var(--mut)", fontSize: 14 }} className="hover:text-[var(--text)]">{l}</Link>))}
+          </FSection>
+          <FSection title="Legal">
+            {LEGAL.map(([l, h]) => (<Link key={l} href={h} style={{ color: "var(--mut)", fontSize: 14 }} className="hover:text-[var(--text)]">{l}</Link>))}
+          </FSection>
         </div>
 
-        <div className="hairline" style={{ margin: "30px 0 20px" }} />
+        <div className="hairline" style={{ margin: "22px 0 16px" }} />
 
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <span style={{ color: "var(--dim)", fontSize: 15 }}>© MMXXVI {SITE.name} Labs</span>
-          <div className="flex items-center gap-4">
-            <a href="https://x.com/neumadotfamily" target="_blank" rel="noreferrer" style={{ textDecoration: "underline", textUnderlineOffset: 3, fontSize: 15 }}>@neumadotfamily</a>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <span style={{ color: "var(--dim)", fontSize: 13 }}>© MMXXVI {SITE.name} Labs · Not financial advice</span>
+          <div className="flex items-center gap-3">
+            <a href="https://x.com/neumadotfamily" target="_blank" rel="noreferrer" style={{ textDecoration: "underline", textUnderlineOffset: 3, fontSize: 13.5, color: "var(--mut)" }}>@neumadotfamily</a>
             <a href="https://x.com/neumadotfamily" target="_blank" rel="noreferrer" aria-label="X"
-              style={{ width: 48, height: 48, borderRadius: 12, border: "1px solid var(--border)", display: "grid", placeItems: "center", fontSize: 18, fontWeight: 700 }}>𝕏</a>
+              style={{ width: 38, height: 38, borderRadius: 10, border: "1px solid var(--border)", display: "grid", placeItems: "center", fontSize: 15, fontWeight: 700 }}>𝕏</a>
           </div>
         </div>
       </footer>
@@ -60,9 +53,9 @@ export function Footer() {
 
 function FSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ marginTop: 34 }}>
-      <div style={{ color: "var(--dim)", fontSize: 14, marginBottom: 14 }}>{title}</div>
-      <div className="flex flex-wrap items-center" style={{ gap: 26 }}>{children}</div>
+    <div>
+      <div style={{ color: "var(--dim)", fontSize: 12.5, marginBottom: 10 }}>{title}</div>
+      <div className="flex flex-col" style={{ gap: 8 }}>{children}</div>
     </div>
   );
 }

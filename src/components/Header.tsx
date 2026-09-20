@@ -9,7 +9,8 @@ export function Header() {
     <header className="sticky top-0 z-40" style={{ background: "rgba(12,12,13,.78)", backdropFilter: "blur(12px)", borderBottom: "1px solid var(--border)" }}>
       <div className="wrap flex items-center gap-6 py-3">
         <Link href="/" className="flex items-center gap-2.5">
-          <span style={{ width: 34, height: 34, borderRadius: 10, background: "var(--cream)", color: "var(--cream-ink)", display: "grid", placeItems: "center", fontWeight: 800, fontSize: 18 }}>◗</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/neuma.png" alt="Neuma" width={32} height={32} style={{ borderRadius: 9, border: "1px solid var(--border)", display: "block" }} />
           <span style={{ fontWeight: 700, fontSize: 19, letterSpacing: "-.01em" }}>{SITE.name}</span>
         </Link>
         <nav className="ml-4 hidden items-center gap-6 sm:flex" style={{ fontSize: 15 }}>
