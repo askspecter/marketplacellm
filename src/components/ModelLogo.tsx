@@ -11,9 +11,17 @@ import { providerFromId } from "@/lib/models";
  */
 export function ModelLogo({ model, size = 44, radius = 12 }: { model?: string; size?: number; radius?: number }) {
   const p = providerFromId(model);
-  const sources = p.domain
-    ? [`https://icons.duckduckgo.com/ip3/${p.domain}.ico`, `https://www.google.com/s2/favicons?sz=128&domain=${p.domain}`]
-    : [];
+  // Prefer unavatar (returns the real brand logo for a domain, and HuggingFace
+  // org avatars for labs without a brand site), with favicon services as
+  // backups. `?fallback=false` makes unavatar 404 when it has nothing, so the
+  // <img> onError cascades to the next source instead of showing a placeholder.
+  const sources: string[] = [];
+  if (p.domain) {
+    sources.push(`https://unavatar.io/${p.domain}?fallback=false`);
+    sources.push(`https://www.google.com/s2/favicons?sz=128&domain=${p.domain}`);
+  }
+  if (p.hf) sources.push(`https://unavatar.io/huggingface/${encodeURIComponent(p.hf)}?fallback=false`);
+  if (p.domain) sources.push(`https://icons.duckduckgo.com/ip3/${p.domain}.ico`);
   const [idx, setIdx] = useState(0);
   const src = sources[idx];
 
