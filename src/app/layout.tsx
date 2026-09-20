@@ -37,7 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <Providers>
-          <div className="app-shell flex min-h-dvh flex-col overflow-x-hidden">
+          <div className="app-shell flex min-h-dvh flex-col overflow-x-clip">
             <Header />
             <main className="flex-1">{children}</main>
             <Footer />

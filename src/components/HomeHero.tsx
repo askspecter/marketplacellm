@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { ModelLogo } from "@/components/ModelLogo";
 import { providerFromId } from "@/lib/models";
 import { usdFull, compact } from "@/lib/format";
 
@@ -89,7 +90,7 @@ export function HomeHero() {
               >
                 <div className="rc-glow" />
                 <div style={{ position: "relative" }}>
-                  <div style={{ width: 40, height: 40, borderRadius: 12, background: p.color, color: p.ink, display: "grid", placeItems: "center", fontWeight: 800, fontSize: 17, lineHeight: 1, fontFamily: "var(--font-ui)" }}>{p.short}</div>
+                  <ModelLogo model={m.id} size={40} radius={12} />
                   <div className="rc-name">{m.name}</div>
                   <div className="rc-sub">{p.name}</div>
                   <div className="rc-foot">fees → compute</div>
