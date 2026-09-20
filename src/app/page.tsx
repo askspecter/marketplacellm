@@ -108,10 +108,14 @@ function AgentCard({ it }: { it: Item }) {
           <span style={{ fontWeight: 700, fontSize: 18, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{it.agentName ?? "Agent"}</span>
           <span className="mono" style={{ color: "var(--dim)", fontSize: 13, flexShrink: 0 }}>${it.ticker ?? "—"}</span>
         </div>
-        <div className="mono flex items-center gap-2" style={{ marginTop: 8, color: "var(--mut)", fontSize: 12.5 }}>
-          <ModelLogo model={it.model ?? undefined} size={18} radius={5} />
-          <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{it.modelName ?? (it.model ? modelTail(it.model) : "unlinked")}</span>
-        </div>
+        {it.model ? (
+          <div className="mono flex items-center gap-2" style={{ marginTop: 8, color: "var(--mut)", fontSize: 12.5 }}>
+            <ModelLogo model={it.model} size={18} radius={5} />
+            <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{it.modelName ?? modelTail(it.model)}</span>
+          </div>
+        ) : (
+          <div className="mono" style={{ marginTop: 8, color: "var(--dim)", fontSize: 12.5 }}>Robinhood Chain token</div>
+        )}
         <div className="mono flex items-center justify-between" style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid var(--border)", color: "var(--dim)", fontSize: 12 }}>
           <span>{shortAddr(it.token)}</span>
           <span>by {shortAddr(it.deployer)}</span>

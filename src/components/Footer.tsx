@@ -27,12 +27,12 @@ export function Footer() {
           every transaction. {SITE.name} does not custody assets.
         </p>
 
-        <div className="flex flex-wrap" style={{ gap: 40, marginTop: 22 }}>
+        <div className="flex flex-col" style={{ gap: 18, marginTop: 22 }}>
           <FSection title="Product">
-            {PRODUCT.map(([l, h]) => (<Link key={l} href={h} style={{ color: "var(--mut)", fontSize: 14 }} className="hover:text-[var(--text)]">{l}</Link>))}
+            {PRODUCT.map(([l, h]) => (<Link key={l} href={h} style={{ color: "var(--mut)", fontSize: 15 }} className="hover:text-[var(--text)]">{l}</Link>))}
           </FSection>
           <FSection title="Legal">
-            {LEGAL.map(([l, h]) => (<Link key={l} href={h} style={{ color: "var(--mut)", fontSize: 14 }} className="hover:text-[var(--text)]">{l}</Link>))}
+            {LEGAL.map(([l, h]) => (<Link key={l} href={h} style={{ color: "var(--mut)", fontSize: 15 }} className="hover:text-[var(--text)]">{l}</Link>))}
           </FSection>
         </div>
 
@@ -55,7 +55,7 @@ function FSection({ title, children }: { title: string; children: React.ReactNod
   return (
     <div>
       <div style={{ color: "var(--dim)", fontSize: 12.5, marginBottom: 10 }}>{title}</div>
-      <div className="flex flex-col" style={{ gap: 8 }}>{children}</div>
+      <div className="flex flex-wrap items-center" style={{ gap: 22 }}>{children}</div>
     </div>
   );
 }

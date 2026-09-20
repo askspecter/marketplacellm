@@ -66,7 +66,12 @@ export default function AgentPage({ params }: { params: { address: string } }) {
           {/* Header */}
           <div className="card" style={{ padding: 15 }}>
             <div className="flex items-center gap-4">
-              <ModelLogo model={model?.model} size={56} radius={16} />
+              {data?.logo ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={data.logo} alt="" width={56} height={56} style={{ borderRadius: 16, objectFit: "cover", flexShrink: 0 }} onError={(e) => ((e.currentTarget.style.display = "none"))} />
+              ) : (
+                <ModelLogo model={model?.model} size={56} radius={16} />
+              )}
               <div style={{ minWidth: 0, flex: 1 }}>
                 <div className="flex items-center gap-2" style={{ flexWrap: "wrap" }}>
                   <span style={{ fontWeight: 700, fontSize: 22 }}>{agentName}</span>

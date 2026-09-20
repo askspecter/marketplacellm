@@ -17,9 +17,9 @@
   --text: #f5f5f7;
   --mut: rgba(245, 245, 247, 0.55);
   --dim: rgba(245, 245, 247, 0.32);
-  --cream: #e9e9ee;          /* chrome / silver accent */
-  --cream-ink: #0a0a0b;
-  --chrome: linear-gradient(180deg, #ffffff 0%, #d5d5db 55%, #b7b7be 100%);
+  --cream: #a3e635;          /* brand green (matches the glass logo) */
+  --cream-ink: #0a1400;
+  --chrome: linear-gradient(180deg, #b6f24a 0%, #93d81e 100%);
   --green: #74c88a;
   --green-deep: #3f7a53;
   --red: #ef7a7c;

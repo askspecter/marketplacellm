@@ -10,8 +10,8 @@ export function Header() {
       <div className="wrap flex items-center gap-6 py-3">
         <Link href="/" className="flex items-center gap-2.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/neuma.png" alt="Neuma" width={32} height={32} style={{ borderRadius: 9, border: "1px solid var(--border)", display: "block" }} />
-          <span style={{ fontWeight: 700, fontSize: 19, letterSpacing: "-.01em" }}>{SITE.name}</span>
+          <img src="/neuma.png" alt="Neuma" width={30} height={30} style={{ borderRadius: 8, display: "block", objectFit: "cover" }} />
+          <span style={{ fontWeight: 700, fontSize: 19, letterSpacing: "-.02em" }}>{SITE.name}</span>
         </Link>
         <nav className="ml-4 hidden items-center gap-6 sm:flex" style={{ fontSize: 15 }}>
           {[["Explore", "/"], ["Create", "/create"], ["Portfolio", "/portfolio"], ["Compute", "/compute"]].map(([l, h]) => (
