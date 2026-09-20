@@ -56,7 +56,7 @@ export async function GET() {
       agentName: link?.agentName ?? null,
       ticker: link?.ticker ?? null,
       bio: link?.bio ?? null,
-      logo: null,
+      logo: link?.logo ?? null,
     };
   });
 
@@ -75,7 +75,7 @@ export async function GET() {
       agentName: l.agentName ?? null,
       ticker: l.ticker ?? null,
       bio: l.bio ?? null,
-      logo: null,
+      logo: l.logo ?? null,
     });
   }
 
@@ -83,12 +83,13 @@ export async function GET() {
   // name / symbol / logo, so foreign launches render with a real identity.
   await Promise.allSettled(
     feed.map(async (it) => {
-      if (it.agentName) return;
+      // Skip only when we already have both a name and an image.
+      if (it.agentName && it.logo) return;
       try {
         const info = await readTokenInfoV2(it.token as Address);
-        it.agentName = info.name || it.agentName;
+        it.agentName = it.agentName ?? info.name ?? null;
         it.ticker = it.ticker ?? info.symbol ?? null;
-        it.logo = info.logo || null;
+        it.logo = it.logo ?? info.logo ?? null;
       } catch {
         /* leave nulls; the card falls back gracefully */
       }

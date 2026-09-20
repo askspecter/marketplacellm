@@ -18,7 +18,7 @@ interface TokenData {
   error?: string;
 }
 interface PoolData {
-  link: { model: string; modelName: string; agentName?: string; ticker?: string; bio?: string; personality?: string; temperature?: number } | null;
+  link: { model: string; modelName: string; agentName?: string; ticker?: string; bio?: string; logo?: string; personality?: string; temperature?: number } | null;
   spendUsd: number; creditedUsd: number; remainingUsd: number;
 }
 
@@ -46,6 +46,7 @@ export default function AgentPage({ params }: { params: { address: string } }) {
   const model = pool?.link ?? null;
   const agentName = model?.agentName || data?.name || "Agent";
   const bio = model?.bio || data?.description || "";
+  const logo = model?.logo || data?.logo || "";
   const curve = data?.curve ?? null;
   const isNative = !data?.pairToken || data.pairToken === "0x0000000000000000000000000000000000000000";
   const progressPct = curve ? Math.min(100, Math.round(curve.progress * 100)) : 0;
@@ -66,9 +67,9 @@ export default function AgentPage({ params }: { params: { address: string } }) {
           {/* Header */}
           <div className="card" style={{ padding: 15 }}>
             <div className="flex items-center gap-4">
-              {data?.logo ? (
+              {logo ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={data.logo} alt="" width={56} height={56} style={{ borderRadius: 16, objectFit: "cover", flexShrink: 0 }} onError={(e) => ((e.currentTarget.style.display = "none"))} />
+                <img src={logo} alt="" width={56} height={56} style={{ borderRadius: 16, objectFit: "cover", flexShrink: 0 }} onError={(e) => ((e.currentTarget.style.display = "none"))} />
               ) : (
                 <ModelLogo model={model?.model} size={56} radius={16} />
               )}

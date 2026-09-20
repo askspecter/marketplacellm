@@ -37,6 +37,8 @@ const PostBody = z.object({
   agentName: z.string().max(64).optional(),
   ticker: z.string().max(16).optional(),
   bio: z.string().max(280).optional(),
+  // Full agent image, stored off-chain. Capped so a huge upload can't bloat KV.
+  logo: z.string().max(400_000).optional(),
   personality: z.string().max(4000).optional(),
   temperature: z.number().min(0).max(2).optional(),
 });
@@ -81,6 +83,7 @@ export async function POST(req: Request) {
     agentName: body.agentName,
     ticker: body.ticker,
     bio: body.bio,
+    logo: body.logo,
     personality: body.personality,
     temperature: body.temperature,
   });

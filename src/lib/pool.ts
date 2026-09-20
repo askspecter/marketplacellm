@@ -32,6 +32,8 @@ export interface LaunchLink {
   ticker?: string;
   /** One-line bio shown on cards and the agent header. */
   bio?: string;
+  /** Full-resolution agent image (data URI) kept off-chain to keep launches cheap. */
+  logo?: string;
   /** System prompt — the agent's authoritative personality. */
   personality?: string;
   /** Behavior tuning: sampling temperature (0–2). */

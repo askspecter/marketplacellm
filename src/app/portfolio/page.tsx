@@ -7,6 +7,7 @@ import { formatUnits } from "viem";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { ClaimFees } from "@/components/ClaimFees";
 import { shortAddr, usd } from "@/lib/format";
+import { SITE } from "@/lib/site";
 
 interface Launched {
   token: string;
@@ -51,22 +52,22 @@ export default function PortfolioPage() {
   }, [address]);
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10">
-      <h1 className="text-3xl font-bold tracking-tight">Portfolio</h1>
-      <p className="mt-2 text-white/60">Your launches, holdings, and the compute your tokens have funded.</p>
+    <div className="wrap" style={{ paddingTop: 26, paddingBottom: 48 }}>
+      <h1 style={{ fontSize: 30, fontWeight: 700, letterSpacing: "-.02em" }}>Portfolio</h1>
+      <p style={{ marginTop: 8, maxWidth: "60ch", color: "var(--mut)" }}>Your launches, holdings, and the compute your tokens have funded.</p>
 
       {!isConnected ? (
-        <div className="mt-8 rounded-xl2 border border-bg-line bg-bg-panel p-10 text-center">
-          <p className="mb-4 text-white/60">Connect a wallet to see your portfolio.</p>
+        <div className="card" style={{ marginTop: 30, padding: 40, textAlign: "center" }}>
+          <p style={{ marginBottom: 16, color: "var(--mut)" }}>Connect a wallet to see your portfolio.</p>
           <div className="flex justify-center">
             <ConnectButton label="Connect wallet" />
           </div>
         </div>
       ) : (
-        <div className="mt-8 space-y-8">
+        <div className="flex flex-col" style={{ gap: 20, marginTop: 30 }}>
           <ClaimFees />
 
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
             <SummaryCard label="Launches" value={String(data?.launched.length ?? (loading ? "…" : 0))} />
             <SummaryCard label="Holdings" value={String(data?.holdings.length ?? (loading ? "…" : 0))} />
             <SummaryCard label="Compute funded (spent)" value={usd(data?.spentUsd ?? 0)} />
@@ -76,23 +77,23 @@ export default function PortfolioPage() {
             {loading && !data ? (
               <Muted>Loading…</Muted>
             ) : data && data.launched.length > 0 ? (
-              <div className="divide-y divide-bg-line">
+              <div>
                 {data.launched.map((l) => (
                   <Row key={l.token} href={`/token/${l.token}`}>
-                    <div>
-                      <div className="font-medium text-white">
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontWeight: 600 }}>
                         {l.agentName ?? l.modelName}
-                        {l.ticker ? <span className="ml-1 font-mono text-xs text-white/40">${l.ticker}</span> : null}
+                        {l.ticker ? <span className="mono" style={{ marginLeft: 6, fontSize: 12, color: "var(--dim)" }}>${l.ticker}</span> : null}
                       </div>
-                      <div className="font-mono text-xs text-white/40">brain: {l.modelName} · {shortAddr(l.token)}</div>
+                      <div className="mono" style={{ fontSize: 12, color: "var(--dim)", marginTop: 2 }}>brain: {l.modelName} · {shortAddr(l.token)}</div>
                     </div>
-                    <div className="text-right font-mono text-sm text-white/70">{usd(l.spendUsd)} spent</div>
+                    <div className="mono" style={{ textAlign: "right", fontSize: 14, color: "var(--mut)", flexShrink: 0 }}>{usd(l.spendUsd)} spent</div>
                   </Row>
                 ))}
               </div>
             ) : (
               <Muted>
-                No launches yet. <Link href="/create" className="text-cyan-soft hover:text-cyan">Launch one →</Link>
+                No launches yet. <Link href="/create" style={{ color: "var(--cream)", textDecoration: "underline", textUnderlineOffset: 3 }}>Launch one →</Link>
               </Muted>
             )}
           </Section>
@@ -101,21 +102,21 @@ export default function PortfolioPage() {
             {loading && !data ? (
               <Muted>Loading…</Muted>
             ) : data && data.holdings.length > 0 ? (
-              <div className="divide-y divide-bg-line">
+              <div>
                 {data.holdings.map((h) => (
                   <Row key={h.token} href={`/token/${h.token}`}>
-                    <div>
-                      <div className="font-medium text-white">${h.symbol}</div>
-                      <div className="font-mono text-xs text-white/40">funds {h.modelName}</div>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontWeight: 600 }}>${h.symbol}</div>
+                      <div className="mono" style={{ fontSize: 12, color: "var(--dim)", marginTop: 2 }}>funds {h.modelName}</div>
                     </div>
-                    <div className="text-right font-mono text-sm text-white/70">
+                    <div className="mono" style={{ textAlign: "right", fontSize: 14, color: "var(--mut)", flexShrink: 0 }}>
                       {Number(formatUnits(BigInt(h.balance), 18)).toLocaleString("en-US", { maximumFractionDigits: 2 })}
                     </div>
                   </Row>
                 ))}
               </div>
             ) : (
-              <Muted>No holdings in LLMPad-known tokens (or chain unreachable).</Muted>
+              <Muted>No holdings in {SITE.name}-known tokens yet (or the chain is unreachable).</Muted>
             )}
           </Section>
         </div>

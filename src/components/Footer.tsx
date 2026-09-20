@@ -6,11 +6,11 @@ const PRODUCT: [string, string][] = [
   ["Create", "/create"],
   ["Portfolio", "/portfolio"],
   ["Compute", "/compute"],
-  ["Docs", "/#"],
+  ["Docs", "/docs"],
 ];
 const LEGAL: [string, string][] = [
-  ["Privacy Policy", "/#"],
-  ["Terms of Use", "/#"],
+  ["Privacy Policy", "/privacy"],
+  ["Terms of Use", "/terms"],
 ];
 
 export function Footer() {

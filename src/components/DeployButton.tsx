@@ -16,6 +16,7 @@ export function DeployButton({
   ticker,
   description,
   imageUri,
+  logo,
   model,
   personality,
   temperature,
@@ -25,7 +26,10 @@ export function DeployButton({
   name: string;
   ticker: string;
   description: string;
+  /** Tiny, byte-capped thumbnail written into on-chain metadata. */
   imageUri: string;
+  /** Full-resolution image stored off-chain (shown across the UI). */
+  logo?: string;
   model: PickerModel | null;
   personality?: string;
   temperature?: number;
@@ -68,6 +72,7 @@ export function DeployButton({
             agentName: name.trim(),
             ticker: ticker.trim().toUpperCase(),
             bio: description.trim(),
+            logo: logo || imageUri || undefined,
             personality: personality?.trim() || undefined,
             temperature,
           }),
@@ -80,7 +85,7 @@ export function DeployButton({
     } catch {
       setPhase("done");
     }
-  }, [receipt, model, address, onLaunched, name, ticker, description, personality, temperature]);
+  }, [receipt, model, address, onLaunched, name, ticker, description, logo, imageUri, personality, temperature]);
 
   const disabled =
     !isConnected || !model || !name.trim() || !ticker.trim() || phase === "preparing" || phase === "signing" || phase === "pending";

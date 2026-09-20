@@ -70,10 +70,14 @@ export function PriceChart({
       (i / (series.length - 1)) * w,
       h - ((v - min) / range) * (h - pad * 2) - pad,
     ]);
-    const color = positive ? "#a3e635" : "#fb7185";
+    // Read brand colors from the theme so the chart adapts to light/dark.
+    const css = getComputedStyle(document.documentElement);
+    const cream = css.getPropertyValue("--cream").trim() || "#92e01f";
+    const red = css.getPropertyValue("--red").trim() || "#ef7a7c";
+    const color = positive ? cream : red;
 
     const grad = ctx.createLinearGradient(0, 0, 0, h);
-    grad.addColorStop(0, positive ? "rgba(163,230,53,0.28)" : "rgba(251,113,133,0.28)");
+    grad.addColorStop(0, positive ? "rgba(146,224,31,0.26)" : "rgba(239,122,124,0.26)");
     grad.addColorStop(1, "rgba(0,0,0,0)");
     ctx.beginPath();
     ctx.moveTo(xy[0][0], h);
@@ -92,10 +96,10 @@ export function PriceChart({
   }, [points, usdMode]);
 
   if (points === null)
-    return <div className="h-[200px] animate-pulse rounded-xl2 border border-bg-line bg-bg-panel/60" />;
+    return <div style={{ height: 200, borderRadius: 14, background: "var(--bg-soft)", opacity: 0.6 }} className="animate-pulse" />;
   if (points.length < 2)
     return (
-      <div className="grid h-[200px] place-items-center rounded-xl2 border border-bg-line bg-bg-panel text-sm text-white/40">
+      <div style={{ height: 200, display: "grid", placeItems: "center", borderRadius: 14, background: "var(--bg-soft)", color: "var(--dim)", fontSize: 14, textAlign: "center", padding: "0 16px" }}>
         No trades yet — the chart appears after the first buy.
       </div>
     );
@@ -108,20 +112,20 @@ export function PriceChart({
   const up = changePct >= 0;
 
   return (
-    <div className="rounded-xl2 border border-bg-line bg-bg-panel p-5">
+    <div>
       <div className="flex items-start justify-between">
         <div>
-          <div className="text-xs uppercase tracking-widest text-white/40">Price ({usdMode ? "USD" : quoteSymbol})</div>
-          <div className="mt-1 font-mono text-2xl font-bold">
+          <div className="mono" style={{ fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--dim)" }}>Price ({usdMode ? "USD" : quoteSymbol})</div>
+          <div className="num" style={{ marginTop: 4, fontSize: 24, fontWeight: 700 }}>
             {usdMode ? usd(lastVal, 6) : `${lastVal.toPrecision(4)} ${quoteSymbol}`}
           </div>
         </div>
-        <span className={`font-mono text-sm font-semibold ${up ? "text-lime" : "text-ember"}`}>
+        <span className="mono" style={{ fontSize: 14, fontWeight: 600, color: up ? "var(--green)" : "var(--red)" }}>
           {up ? "+" : ""}
           {changePct.toFixed(2)}%
         </span>
       </div>
-      <canvas ref={canvasRef} className="mt-3 h-[180px] w-full" />
+      <canvas ref={canvasRef} style={{ marginTop: 12, height: 180, width: "100%" }} />
     </div>
   );
 }
