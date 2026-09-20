@@ -1,25 +1,48 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { SITE } from "@/lib/site";
 
+const NAV: [string, string][] = [
+  ["Explore", "/"],
+  ["Create", "/create"],
+  ["Portfolio", "/portfolio"],
+  ["Compute", "/compute"],
+];
+
 export function Header() {
+  const pathname = usePathname();
+  const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+
   return (
-    <header className="sticky top-0 z-40" style={{ background: "rgba(12,12,13,.78)", backdropFilter: "blur(12px)", borderBottom: "1px solid var(--border)" }}>
-      <div className="wrap flex items-center gap-6 py-3">
-        <Link href="/" className="flex items-center gap-2.5">
+    <header className="sticky top-0 z-40" style={{ background: "color-mix(in srgb, var(--bg) 78%, transparent)", backdropFilter: "blur(12px)", borderBottom: "1px solid var(--border)" }}>
+      <div className="wrap flex items-center gap-3 py-3">
+        <Link href="/" className="flex items-center gap-2" style={{ flexShrink: 0 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/neuma.png" alt="Neuma" width={30} height={30} style={{ borderRadius: 8, display: "block", objectFit: "cover" }} />
-          <span style={{ fontWeight: 700, fontSize: 19, letterSpacing: "-.02em" }}>{SITE.name}</span>
+          <span className="hidden sm:inline" style={{ fontWeight: 700, fontSize: 19, letterSpacing: "-.02em" }}>{SITE.name}</span>
         </Link>
-        <nav className="ml-4 hidden items-center gap-6 sm:flex" style={{ fontSize: 15 }}>
-          {[["Explore", "/"], ["Create", "/create"], ["Portfolio", "/portfolio"], ["Compute", "/compute"]].map(([l, h]) => (
-            <Link key={l} href={h} style={{ color: "var(--mut)" }} className="transition-colors hover:text-[var(--text)]">{l}</Link>
-          ))}
+
+        {/* Pill nav (scrolls if tight) */}
+        <nav className="flex items-center" style={{ gap: 4, padding: 4, borderRadius: 999, background: "var(--card-2)", border: "1px solid var(--border)", overflowX: "auto", scrollbarWidth: "none" }}>
+          {NAV.map(([l, h]) => {
+            const active = isActive(h);
+            return (
+              <Link key={l} href={h} style={{
+                padding: "7px 14px", borderRadius: 999, fontSize: 14, fontWeight: 500, whiteSpace: "nowrap",
+                color: active ? "var(--cream-ink)" : "var(--mut)",
+                background: active ? "var(--cream)" : "transparent",
+              }}>{l}</Link>
+            );
+          })}
         </nav>
-        <div className="ml-auto">
-          <ConnectButton accountStatus="address" chainStatus="icon" showBalance={false} label="Connect" />
+
+        <div className="ml-auto flex items-center gap-2.5" style={{ flexShrink: 0 }}>
+          <ThemeToggle />
+          <ConnectButton accountStatus="address" chainStatus="none" showBalance={false} label="Connect" />
         </div>
       </div>
     </header>

@@ -30,9 +30,25 @@
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
+/* Light theme — same tokens flipped, so every var()-based style adapts. */
+:root[data-theme="light"] {
+  --bg: #f6f6f3;
+  --bg-soft: #eeeeeb;
+  --card: #ffffff;
+  --card-2: #f2f2ee;
+  --border: rgba(0, 0, 0, 0.10);
+  --border-2: rgba(0, 0, 0, 0.16);
+  --text: #0b0b0d;
+  --mut: rgba(11, 11, 13, 0.60);
+  --dim: rgba(11, 11, 13, 0.40);
+  --cream: #86c800;
+  --cream-ink: #08120a;
+  --chrome: linear-gradient(180deg, #9be21f 0%, #7bb300 100%);
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { -webkit-font-smoothing: antialiased; }
-html, body { background: var(--bg); color: var(--text); }
+html, body { background: var(--bg); color: var(--text); transition: background .2s ease, color .2s ease; }
 body { font-family: var(--font-ui); min-height: 100vh; overflow-x: hidden; }
 a { color: inherit; text-decoration: none; }
 ::selection { background: var(--cream); color: var(--cream-ink); }
