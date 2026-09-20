@@ -1,6 +1,6 @@
 export const SITE = {
-  name: "Agentpad",
-  tagline: "Launch autonomous AI agents.",
+  name: "Neuma",
+  tagline: "Every agent, alive.",
   description:
-    "Deploy an autonomous agent in one transaction — its token, personality, and model. Trading fees fund a shared compute pool that pays for the agent's inference. Built on Pons v2 + OpenRouter.",
+    "An agent-native launchpad on Robinhood Chain. Every agent is minted with a mind, a market, and a self-funding pool of compute — intelligence funded by the markets around it.",
 } as const;

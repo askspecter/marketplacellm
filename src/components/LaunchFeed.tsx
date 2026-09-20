@@ -44,28 +44,21 @@ export function LaunchFeed() {
     );
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 1, background: "var(--line)", border: "1px solid var(--line)" }}>
       {items.map((it) => (
-        <Link
-          key={it.token}
-          href={`/token/${it.token}`}
-          className="group rounded-xl2 border border-bg-line bg-bg-panel p-4 transition hover:border-cyan/40 hover:shadow-glow"
-        >
-          <div className="flex items-center justify-between">
-            <span className="font-semibold text-white group-hover:text-cyan-soft">
-              {it.agentName ?? "Unnamed agent"}
-              {it.ticker ? <span className="ml-1 font-mono text-xs text-white/40">${it.ticker}</span> : null}
+        <Link key={it.token} href={`/token/${it.token}`} data-hover className="feedcard" style={{ background: "var(--bg)", padding: "24px 22px", display: "block" }}>
+          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 10 }}>
+            <span className="display" style={{ fontSize: 24 }}>
+              {it.agentName ?? "Unnamed"}
+              {it.ticker ? <span className="mono" style={{ marginLeft: 8, fontSize: 12, color: "var(--dim)" }}>${it.ticker}</span> : null}
             </span>
-            <span className="rounded-full bg-signature-soft px-2 py-0.5 text-[10px] font-semibold text-cyan-soft">
-              agent
-            </span>
+            <span className="mono" style={{ fontSize: 10, letterSpacing: ".18em", textTransform: "uppercase", color: "var(--accent)" }}>agent</span>
           </div>
-          {it.bio && <p className="mt-2 line-clamp-2 text-xs text-white/50">{it.bio}</p>}
-          <div className="mt-3 text-xs text-white/40">brain</div>
-          <div className="truncate font-mono text-sm text-white/80">{it.modelName ?? "— unlinked —"}</div>
-          <div className="mt-3 flex items-center justify-between text-xs text-white/40">
-            <span>by {shortAddr(it.deployer)}</span>
-            <span className="text-cyan-soft opacity-0 transition group-hover:opacity-100">open →</span>
+          {it.bio && <p style={{ marginTop: 12, fontSize: 13, lineHeight: 1.55, color: "var(--mut)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{it.bio}</p>}
+          <div className="mono" style={{ marginTop: 18, fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--dim)" }}>brain</div>
+          <div className="mono" style={{ fontSize: 13, color: "var(--ink)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{it.modelName ?? "— unlinked —"}</div>
+          <div className="mono" style={{ marginTop: 16, display: "flex", justifyContent: "space-between", fontSize: 11, color: "var(--dim)" }}>
+            <span>by {shortAddr(it.deployer)}</span><span>open →</span>
           </div>
         </Link>
       ))}
@@ -75,9 +68,9 @@ export function LaunchFeed() {
 
 function SkeletonGrid() {
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 1, background: "var(--line)", border: "1px solid var(--line)" }}>
       {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="h-32 animate-pulse rounded-xl2 border border-bg-line bg-bg-panel/60" />
+        <div key={i} style={{ background: "var(--bg)", height: 150 }} />
       ))}
     </div>
   );
@@ -85,7 +78,7 @@ function SkeletonGrid() {
 
 function EmptyCard({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-xl2 border border-dashed border-bg-line bg-bg-panel/50 p-10 text-center text-white/50">
+    <div style={{ border: "1px dashed var(--line)", padding: 48, textAlign: "center", color: "var(--mut)", fontFamily: "var(--font-mono)", fontSize: 13, letterSpacing: ".06em" }}>
       {children}
     </div>
   );

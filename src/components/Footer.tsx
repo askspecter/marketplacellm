@@ -3,22 +3,24 @@ import { SITE } from "@/lib/site";
 
 export function Footer() {
   return (
-    <footer className="border-t border-bg-line">
-      <div className="mx-auto max-w-6xl px-4 py-10 text-sm text-white/50">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <div className="font-semibold text-white/80">{SITE.name} — {SITE.tagline}</div>
-            <div className="mt-1 text-xs text-white/40">
-              A third-party interface to the Pons v2 protocol on Robinhood Chain. Not affiliated with Pons or OpenRouter.
-              Not financial advice.
-            </div>
-          </div>
-          <div className="flex gap-5">
-            <Link href="/create" className="hover:text-white">Launch</Link>
-            <Link href="/compute" className="hover:text-white">Compute</Link>
-            <a href="https://openrouter.ai" target="_blank" rel="noreferrer" className="hover:text-white">OpenRouter</a>
-          </div>
+    <footer style={{ borderTop: "1px solid var(--line)" }}>
+      <div className="wrap flex flex-wrap items-end justify-between gap-6 py-12">
+        <div>
+          <div className="display text-4xl">{SITE.name}<span style={{ color: "var(--accent)" }}>.</span></div>
+          <p className="mt-3 max-w-md text-sm" style={{ color: "var(--mut)" }}>
+            A third-party interface to the Pons v2 protocol on Robinhood Chain. Not affiliated with Pons or OpenRouter.
+            Non-custodial. Not financial advice.
+          </p>
         </div>
+        <div className="flex gap-7" style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--mut)" }}>
+          <Link href="/create" className="transition hover:text-[var(--ink)]">Launch</Link>
+          <Link href="/compute" className="transition hover:text-[var(--ink)]">Compute</Link>
+          <a href="https://openrouter.ai" target="_blank" rel="noreferrer" className="transition hover:text-[var(--ink)]">OpenRouter</a>
+        </div>
+      </div>
+      <div className="wrap flex justify-between pb-8" style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: ".2em", textTransform: "uppercase", color: "var(--dim)" }}>
+        <span>© MMXXVI — {SITE.name} Atelier</span>
+        <span>Robinhood Chain · Non-custodial</span>
       </div>
     </footer>
   );
