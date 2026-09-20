@@ -3,9 +3,12 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { isAddress } from "viem";
+import { useAccount } from "wagmi";
 import { TradeWidget, type CurveInputsSerialized } from "@/components/TradeWidget";
 import { PriceChart } from "@/components/PriceChart";
 import { AgentConsole } from "@/components/AgentConsole";
+import { ClaimFees } from "@/components/ClaimFees";
+import { CopyButton } from "@/components/CopyButton";
 import { ModelLogo } from "@/components/ModelLogo";
 import { RhBadge } from "@/components/RhBadge";
 import { providerFromId } from "@/lib/models";
@@ -14,7 +17,7 @@ import { shortAddr, usd, usdPrice, usdFull, smallNum } from "@/lib/format";
 interface TokenData {
   token: string; name: string; symbol: string; decimals: number; logo: string; description: string;
   totalSupply?: string | null; ethUsd?: number | null;
-  deployer: string; curveAddress: string; pairToken: string; phase: number; phaseLabel: string;
+  deployer: string; creatorFeeRecipient?: string; curveAddress: string; pairToken: string; phase: number; phaseLabel: string;
   curve: { quoteReserve: string; tokenReserve: string; realQuoteReserve: string; graduationThreshold: string; sellableTokens: string; graduated: boolean; progress: number; spotPrice: number; feeBps: string; creatorTaxBps: string; } | null;
   error?: string;
 }
@@ -25,6 +28,7 @@ interface PoolData {
 
 export default function AgentPage({ params }: { params: { address: string } }) {
   const address = params.address;
+  const { address: wallet } = useAccount();
   const [data, setData] = useState<TokenData | null>(null);
   const [pool, setPool] = useState<PoolData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -63,6 +67,11 @@ export default function AgentPage({ params }: { params: { address: string } }) {
   const marketCapUsd = priceUsd != null ? priceUsd * supplyTokens : null;
   const marketLabel = data ? (data.phase === 0 ? "Bonding curve" : "Uniswap V4") : "—";
 
+  // Is the connected wallet this token's creator? Fees accrue to the creator
+  // fee recipient (falls back to the deployer), so only they see the claim card.
+  const creatorAddr = (data?.creatorFeeRecipient || data?.deployer || "").toLowerCase();
+  const isCreator = !!wallet && !!creatorAddr && wallet.toLowerCase() === creatorAddr;
+
   const serialized: CurveInputsSerialized | null = curve ? {
     quoteReserve: curve.quoteReserve, tokenReserve: curve.tokenReserve, sellableTokens: curve.sellableTokens,
     feeBps: curve.feeBps, creatorTaxBps: curve.creatorTaxBps, graduated: curve.graduated,
@@ -90,7 +99,10 @@ export default function AgentPage({ params }: { params: { address: string } }) {
                   {model?.ticker && <span className="mono" style={{ color: "var(--dim)" }}>${model.ticker}</span>}
                   <RhBadge />
                 </div>
-                <div className="mono" style={{ marginTop: 4, fontSize: 12, color: "var(--dim)" }}>{shortAddr(address)} · by {shortAddr(data?.deployer ?? "")}</div>
+                <div className="flex items-center gap-2" style={{ marginTop: 6, flexWrap: "wrap" }}>
+                  <span className="mono" style={{ fontSize: 12, color: "var(--dim)" }}>{shortAddr(address)} · by {shortAddr(data?.deployer ?? "")}</span>
+                  <CopyButton text={address} label="Copy CA" compact />
+                </div>
               </div>
             </div>
             <div className="flex flex-wrap gap-2" style={{ marginTop: 14 }}>
@@ -150,7 +162,7 @@ export default function AgentPage({ params }: { params: { address: string } }) {
           {/* Details */}
           <div className="card" style={{ padding: 15 }}>
             <div style={{ fontWeight: 600, marginBottom: 12 }}>Details</div>
-            <Detail k="Contract" v={shortAddr(address)} />
+            <Detail k="Contract" v={shortAddr(address)} extra={<CopyButton text={address} label="Copy" compact />} />
             <Detail k="Bonding curve" v={shortAddr(data?.curveAddress ?? "")} />
             <Detail k="Creator" v={shortAddr(data?.deployer ?? "")} />
             <Detail k="Paired asset" v="ETH (native)" />
@@ -180,6 +192,14 @@ export default function AgentPage({ params }: { params: { address: string } }) {
             </div>
           </div>
 
+          {/* Creator-only: claim the fees this agent earned */}
+          {isCreator && (
+            <div className="flex flex-col" style={{ gap: 8 }}>
+              <span className="mono" style={{ fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--cream)" }}>◆ You created this agent</span>
+              <ClaimFees />
+            </div>
+          )}
+
           {model && <AgentConsole token={address} agentName={agentName} />}
         </div>
       </div>
@@ -204,11 +224,11 @@ function Stat({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
-function Detail({ k, v }: { k: string; v: string }) {
+function Detail({ k, v, extra }: { k: string; v: string; extra?: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between" style={{ padding: "10px 0", borderTop: "1px solid var(--border)", fontSize: 14 }}>
-      <span style={{ color: "var(--mut)" }}>{k}</span>
-      <span className="mono">{v}</span>
+    <div className="flex items-center justify-between gap-3" style={{ padding: "10px 0", borderTop: "1px solid var(--border)", fontSize: 14 }}>
+      <span style={{ color: "var(--mut)", flexShrink: 0 }}>{k}</span>
+      <span className="flex items-center gap-2" style={{ minWidth: 0 }}><span className="mono" style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{v}</span>{extra}</span>
     </div>
   );
 }
