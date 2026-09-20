@@ -6,7 +6,7 @@ import { SITE } from "@/lib/site";
 
 export function Header() {
   return (
-    <header style={{ background: "var(--bg)" }}>
+    <header className="sticky top-0 z-40" style={{ background: "color-mix(in srgb, var(--bg) 82%, transparent)", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)" }}>
       <div className="wrap flex items-center" style={{ paddingTop: 14, paddingBottom: 14 }}>
         <Link href="/" className="flex items-center gap-2" style={{ flexShrink: 0 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}

@@ -76,6 +76,29 @@ export function providerFromId(modelId?: string): Provider {
   return { key: prefix, name: prettify(prefix), color: hashColor(prefix), ink: "#f7f7f5", short: letters };
 }
 
+/**
+ * A curated set of real, popular OpenRouter models. Tokens launched without an
+ * explicit brain still "fund a model" in the product's framing, so the feed
+ * assigns one deterministically from the token address for a stable display.
+ */
+const FALLBACK_MODELS: { id: string; name: string }[] = [
+  { id: "anthropic/claude-3.5-sonnet", name: "Claude 3.5 Sonnet" },
+  { id: "openai/gpt-4o", name: "GPT-4o" },
+  { id: "google/gemini-2.0-flash-001", name: "Gemini 2.0 Flash" },
+  { id: "x-ai/grok-2-1212", name: "Grok 2" },
+  { id: "meta-llama/llama-3.3-70b-instruct", name: "Llama 3.3 70B" },
+  { id: "deepseek/deepseek-chat", name: "DeepSeek V3" },
+  { id: "mistralai/mistral-large", name: "Mistral Large" },
+  { id: "qwen/qwen-2.5-72b-instruct", name: "Qwen 2.5 72B" },
+];
+
+/** Deterministic model pick from a seed (e.g. a token address). */
+export function fallbackModel(seed: string): { id: string; name: string } {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+  return FALLBACK_MODELS[h % FALLBACK_MODELS.length];
+}
+
 /** A concise model label, e.g. "claude-3.5-sonnet" → "Claude 3.5 Sonnet"-ish tail. */
 export function modelTail(modelId?: string): string {
   if (!modelId) return "";

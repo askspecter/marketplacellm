@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ModelLogo } from "@/components/ModelLogo";
 import { RhBadge } from "@/components/RhBadge";
-import { providerFromId, modelTail } from "@/lib/models";
+import { providerFromId, modelTail, fallbackModel } from "@/lib/models";
 import { shortAddr } from "@/lib/format";
 
 interface Item {
@@ -82,41 +82,29 @@ function Grid({ children }: { children: React.ReactNode }) {
   return <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(178px, 1fr))", gap: 12 }}>{children}</div>;
 }
 
-function initials(s?: string | null): string {
-  return (s || "?").replace(/[^a-zA-Z0-9]/g, "").slice(0, 2).toUpperCase() || "?";
-}
-function hashHsl(s: string): string {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360;
-  return `hsl(${h}, 46%, 40%)`;
-}
-
 function AgentCard({ it }: { it: Item }) {
-  const p = providerFromId(it.model ?? undefined);
-  const hasModel = !!it.model;
+  // Every token funds a model: use the linked brain, or assign one
+  // deterministically from the address so the feed never shows a bare chain tag.
+  const fb = fallbackModel(it.token);
+  const modelId = it.model ?? fb.id;
+  const modelName = it.modelName ?? (it.model ? modelTail(it.model) : fb.name);
+  const p = providerFromId(modelId);
   const [imgOk, setImgOk] = useState(true);
-  const mono = initials(it.ticker ?? it.agentName);
   return (
     <Link href={`/token/${it.token}`} className="agent-card">
       {/* Art */}
       <div style={{ position: "relative", aspectRatio: "1 / 1", background: `radial-gradient(120% 120% at 30% 12%, ${p.color}2e, transparent 60%), var(--card-2)`, display: "grid", placeItems: "center", overflow: "hidden" }}>
         <div style={{ position: "absolute", top: 8, left: 8, zIndex: 2 }}>
-          {hasModel ? (
-            <span className="badge" style={{ paddingLeft: 4, padding: "3px 8px 3px 4px", fontSize: 10.5 }}>
-              <ModelLogo model={it.model ?? undefined} size={14} radius={4} />
-              {p.name}
-            </span>
-          ) : (
-            <RhBadge />
-          )}
+          <span className="badge" style={{ padding: "3px 8px 3px 4px", fontSize: 10.5 }}>
+            <ModelLogo model={modelId} size={14} radius={4} />
+            {p.name}
+          </span>
         </div>
         {it.logo && imgOk ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={it.logo} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={() => setImgOk(false)} />
-        ) : hasModel ? (
-          <ModelLogo model={it.model ?? undefined} size={78} radius={20} />
         ) : (
-          <div style={{ width: "52%", aspectRatio: "1", borderRadius: 18, background: hashHsl(mono), display: "grid", placeItems: "center", color: "#fff", fontWeight: 800, fontSize: 30 }}>{mono}</div>
+          <ModelLogo model={modelId} size={78} radius={20} />
         )}
       </div>
       {/* Meta */}
@@ -125,14 +113,10 @@ function AgentCard({ it }: { it: Item }) {
           <span style={{ fontWeight: 700, fontSize: 14.5, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{it.agentName ?? "Agent"}</span>
           <span className="mono" style={{ color: "var(--dim)", fontSize: 11.5, flexShrink: 0 }}>${it.ticker ?? "—"}</span>
         </div>
-        {it.model ? (
-          <div className="mono flex items-center gap-1.5" style={{ marginTop: 7, color: "var(--mut)", fontSize: 11 }}>
-            <ModelLogo model={it.model} size={14} radius={4} />
-            <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{it.modelName ?? modelTail(it.model)}</span>
-          </div>
-        ) : (
-          <div className="mono" style={{ marginTop: 7, color: "var(--dim)", fontSize: 11 }}>Robinhood Chain token</div>
-        )}
+        <div className="mono flex items-center gap-1.5" style={{ marginTop: 7, color: "var(--mut)", fontSize: 11 }}>
+          <ModelLogo model={modelId} size={14} radius={4} />
+          <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{modelName}</span>
+        </div>
         <div className="flex items-center justify-between" style={{ marginTop: 10, paddingTop: 9, borderTop: "1px solid var(--border)" }}>
           <span style={{ fontSize: 9.5, fontWeight: 600, letterSpacing: ".03em", textTransform: "uppercase", color: "var(--cream)" }}>fees → compute</span>
           <span className="mono" style={{ fontSize: 10.5, color: "var(--dim)" }}>{shortAddr(it.token)}</span>
