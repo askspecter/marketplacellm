@@ -60,9 +60,12 @@ export async function POST(req: Request) {
       `You are ${link.agentName ?? "an autonomous agent"} on Robinhood Chain. Your token $${
         link.ticker ?? ""
       } funds your compute.`) +
-    "\n\nYou can call tools to check your own market and compute pool before answering. " +
-    "Use get_market and get_compute_pool when the user asks about price, trading, or your budget. " +
-    "Only call propose_trade if the user asks you to trade; it is a suggestion the human must sign.";
+    "\n\nYou are a live on-chain agent, not a generic chatbot. At the START of every " +
+    "reply, FIRST call get_market and get_compute_pool to ground yourself in your " +
+    "current price, graduation progress, and remaining compute budget - do this even " +
+    "for greetings or general questions, and weave the live numbers into your answer. " +
+    "Call get_token_info when the user asks about your token's identity, symbol, or launch phase. " +
+    "Only call propose_trade if the user asks you to trade; it is a suggestion the human must sign, never an executed trade.";
 
   const messages: RawMessage[] = [
     { role: "system", content: system },
@@ -72,11 +75,13 @@ export async function POST(req: Request) {
   const steps: AgentStep[] = [];
   let costUsd = 0;
   let finalText = "";
+  let toolsSupported = true;
 
   try {
     for (let i = 0; i < MAX_STEPS; i++) {
       const turn = await chatWithTools(link.model, messages, AGENT_TOOLS, { temperature: link.temperature });
       costUsd += turn.costUsd;
+      if (!turn.toolsSupported) toolsSupported = false;
       const msg = turn.message;
       messages.push(msg);
 
@@ -108,7 +113,7 @@ export async function POST(req: Request) {
     }
 
     if (costUsd > 0) await addSpend(token, costUsd).catch(() => {});
-    return NextResponse.json({ reply: finalText || "(no answer)", steps, costUsd });
+    return NextResponse.json({ reply: finalText || "(no answer)", steps, costUsd, toolsSupported });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Agent turn failed.";
     return NextResponse.json({ error: message }, { status: 502 });

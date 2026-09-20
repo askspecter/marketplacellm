@@ -17,6 +17,7 @@ export function AgentConsole({ token, agentName }: { token: string; agentName: s
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const [agentic, setAgentic] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
   const down = () => requestAnimationFrame(() => scrollRef.current?.scrollTo({ top: 1e9, behavior: "smooth" }));
 
@@ -30,6 +31,10 @@ export function AgentConsole({ token, agentName }: { token: string; agentName: s
       const res = await fetch("/api/agent", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token, messages: history.map((t) => ({ role: t.role, content: t.content })) }) });
       const data = await res.json();
       if (!res.ok) { setNotice(data.error ?? "The agent couldn't respond."); setTurns(turns); return; }
+      if (typeof data.toolsSupported === "boolean") {
+        setAgentic(data.toolsSupported);
+        if (!data.toolsSupported) setNotice("This model doesn't support tool calling, so the agent is answering as a plain chat. Pick a tool-capable model to enable market/trade actions.");
+      }
       setTurns([...history, { role: "assistant", content: data.reply || "(no answer)", steps: data.steps ?? [] }]); down();
     } catch { setNotice("Network error reaching the agent."); setTurns(turns); }
     finally { setBusy(false); }
@@ -39,7 +44,7 @@ export function AgentConsole({ token, agentName }: { token: string; agentName: s
     <div className="card" style={{ display: "flex", flexDirection: "column", minHeight: 420, overflow: "hidden" }}>
       <div className="flex items-center justify-between" style={{ padding: "14px 18px", borderBottom: "1px solid var(--border)" }}>
         <span style={{ fontSize: 14 }}><span style={{ color: "var(--mut)" }}>Console · </span><span style={{ fontWeight: 600 }}>{agentName}</span></span>
-        <span className="badge">agentic</span>
+        <span className="badge" title={agentic ? "Can read its market & compute pool and propose trades" : "Model without tool calling — plain chat"}>{agentic ? "agentic" : "chat"}</span>
       </div>
 
       <div ref={scrollRef} style={{ flex: 1, overflowY: "auto", padding: 16, display: "flex", flexDirection: "column", gap: 12 }}>

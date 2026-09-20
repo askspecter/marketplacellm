@@ -18,14 +18,30 @@ const BASE = "https://openrouter.ai/api/v1";
  * OpenAI-compatible gateway — notably Orbio (https://api.orbio.so/api/v1),
  * whose CREDIT token (1 CREDIT = $1 of AI usage) lives on Robinhood Chain, so a
  * creator's claimed ETH fees can be swapped into CREDIT and spent here. Set
- * INFERENCE_BASE_URL + INFERENCE_API_KEY to switch; the public model CATALOG and
- * OpenRouter credit/top-up endpoints stay on OpenRouter (they're OR-specific).
+ * INFERENCE_BASE_URL + INFERENCE_API_KEY to switch. The model CATALOG follows
+ * the same gateway (see catalogBase), while the credit/top-up endpoints stay on
+ * OpenRouter (they're OR-specific).
  */
 function inferenceBase(): string {
   return process.env.INFERENCE_BASE_URL?.trim() || BASE;
 }
 function inferenceKey(): string | undefined {
   return process.env.INFERENCE_API_KEY?.trim() || process.env.OPENROUTER_API_KEY?.trim();
+}
+
+/**
+ * Where the model CATALOG is read from. When an inference gateway is configured
+ * (e.g. Orbio via INFERENCE_BASE_URL) the catalog follows it, so the model ids
+ * shown in the picker match the backend that will actually run — and be billed
+ * for — inference. With nothing configured it stays the public OpenRouter
+ * catalog. Set MODELS_BASE_URL to override the catalog source independently.
+ */
+function catalogBase(): string {
+  return process.env.MODELS_BASE_URL?.trim() || process.env.INFERENCE_BASE_URL?.trim() || BASE;
+}
+/** True when the catalog is served by something other than public OpenRouter. */
+function catalogIsExternal(): boolean {
+  return catalogBase() !== BASE;
 }
 
 export interface ORModel {
@@ -41,6 +57,9 @@ export interface ORModel {
   completionPerM: number;
   modalities: string[];
   provider: string;
+  /** Whether the catalog reported pricing for this model. Orbio's OpenAI-style
+   * catalog may omit pricing, in which case `free` is not meaningful. */
+  priceKnown: boolean;
   free: boolean;
 }
 
@@ -66,17 +85,23 @@ function num(s?: string): number {
 export async function fetchModels(): Promise<ORModel[]> {
   if (cache && Date.now() - cache.at < TTL_MS) return cache.models;
 
-  const res = await fetch(`${BASE}/models`, {
-    headers: { Accept: "application/json" },
-    cache: "no-store",
-  });
-  if (!res.ok) throw new Error(`OpenRouter models ${res.status}`);
-  const json = (await res.json()) as { data: ORModelRaw[] };
+  const base = catalogBase();
+  const external = catalogIsExternal();
+  const headers: Record<string, string> = { Accept: "application/json" };
+  // Public OpenRouter /models needs no key; an OpenAI-compatible gateway (Orbio)
+  // typically requires auth on /models, so send the key when the source is external.
+  const key = inferenceKey();
+  if (external && key) headers.Authorization = `Bearer ${key}`;
+
+  const res = await fetch(`${base}/models`, { headers, cache: "no-store" });
+  if (!res.ok) throw new Error(`Model catalog ${res.status}`);
+  const json = (await res.json()) as { data?: ORModelRaw[] };
 
   const models = (json.data ?? []).map((m): ORModel => {
+    const priceKnown = m.pricing != null && (m.pricing.prompt != null || m.pricing.completion != null);
     const promptPrice = num(m.pricing?.prompt);
     const completionPrice = num(m.pricing?.completion);
-    const provider = m.id.includes("/") ? m.id.split("/")[0] : "openrouter";
+    const provider = m.id.includes("/") ? m.id.split("/")[0] : external ? "orbio" : "openrouter";
     const modalities = m.architecture?.input_modalities ?? (m.architecture?.modality ? [m.architecture.modality] : ["text"]);
     return {
       id: m.id,
@@ -89,7 +114,9 @@ export async function fetchModels(): Promise<ORModel[]> {
       completionPerM: completionPrice * 1_000_000,
       modalities,
       provider,
-      free: promptPrice === 0 && completionPrice === 0,
+      priceKnown,
+      // "Free" only means something when pricing is actually reported as zero.
+      free: priceKnown && promptPrice === 0 && completionPrice === 0,
     };
   });
 
@@ -209,6 +236,28 @@ export interface ToolTurn {
   message: RawMessage;
   usage: { promptTokens: number; completionTokens: number; totalTokens: number };
   costUsd: number;
+  /** False when tools were requested but the gateway rejected them and we
+   * retried without them (so the agent answered as a plain chat). */
+  toolsSupported: boolean;
+}
+
+/**
+ * Heuristic: does this upstream error look like the gateway not supporting the
+ * OpenAI `tools` / `tool_choice` fields (rather than a real request error)?
+ * Some OpenAI-compatible backends (incl. some Orbio models) return 400/404/422
+ * for tool calling.
+ */
+function looksLikeToolsUnsupported(status: number, body: string): boolean {
+  if (![400, 404, 405, 422, 501].includes(status)) return false;
+  const t = body.toLowerCase();
+  return (
+    t.includes("tool") ||
+    t.includes("function call") ||
+    t.includes("tool_choice") ||
+    t.includes("not supported") ||
+    t.includes("unsupported") ||
+    t.includes("does not support")
+  );
 }
 
 /**
@@ -223,23 +272,40 @@ export async function chatWithTools(
   opts?: ChatOptions
 ): Promise<ToolTurn> {
   if (!hasKey()) throw new Error("NO_KEY");
-  const res = await fetch(`${inferenceBase()}/chat/completions`, {
-    method: "POST",
-    headers: authHeaders(),
-    body: JSON.stringify({
-      model,
-      messages,
-      tools,
-      tool_choice: "auto",
-      temperature: opts?.temperature,
-      usage: { include: true },
-    }),
-    cache: "no-store",
-  });
+
+  const send = (withTools: boolean) =>
+    fetch(`${inferenceBase()}/chat/completions`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({
+        model,
+        messages,
+        ...(withTools ? { tools, tool_choice: "auto" } : {}),
+        temperature: opts?.temperature,
+        usage: { include: true },
+      }),
+      cache: "no-store",
+    });
+
+  let toolsSupported = tools.length > 0;
+  let res = await send(toolsSupported);
+
+  // If the gateway rejected the tools payload, retry once as a plain chat so the
+  // agent still answers instead of erroring out.
+  if (!res.ok && toolsSupported) {
+    const body = await res.text().catch(() => "");
+    if (looksLikeToolsUnsupported(res.status, body)) {
+      toolsSupported = false;
+      res = await send(false);
+    } else {
+      throw new Error(`Inference ${res.status}: ${body.slice(0, 300)}`);
+    }
+  }
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    throw new Error(`OpenRouter tools ${res.status}: ${text.slice(0, 300)}`);
+    throw new Error(`Inference ${res.status}: ${text.slice(0, 300)}`);
   }
+
   const json = (await res.json()) as {
     choices?: { message?: RawMessage }[];
     usage?: { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number; cost?: number };
@@ -254,6 +320,7 @@ export async function chatWithTools(
       totalTokens: u.total_tokens ?? 0,
     },
     costUsd: u.cost ?? 0,
+    toolsSupported,
   };
 }
 

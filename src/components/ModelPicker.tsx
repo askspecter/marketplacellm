@@ -12,6 +12,7 @@ export interface PickerModel {
   promptPerM: number;
   completionPerM: number;
   modalities: string[];
+  priceKnown?: boolean;
   free: boolean;
 }
 
@@ -60,7 +61,7 @@ export function ModelPicker({ value, onChange }: { value: PickerModel | null; on
                 <div className="mono" style={{ fontSize: 11, color: "var(--dim)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{m.id}</div>
               </div>
               <div className="mono" style={{ textAlign: "right", fontSize: 11, color: "var(--mut)", flexShrink: 0 }}>
-                {m.free ? <span className="up">Free</span> : `${perM(m.promptPerM)}/M`}
+                {m.free ? <span className="up">Free</span> : m.priceKnown === false ? "n/a" : `${perM(m.promptPerM)}/M`}
               </div>
             </button>
           );

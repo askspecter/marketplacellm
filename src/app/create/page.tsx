@@ -117,7 +117,7 @@ export default function CreatePage() {
               <div style={{ fontWeight: 600 }}>{model.name} <span className="mono" style={{ fontSize: 12, color: "var(--dim)" }}>· {providerFromId(model.id).name}</span></div>
               <div className="mono" style={{ fontSize: 11.5, color: "var(--dim)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{model.id}</div>
             </div>
-            <span className="mono" style={{ fontSize: 12, color: "var(--mut)" }}>{model.free ? "Free" : `${perM(model.promptPerM)}/M`}</span>
+            <span className="mono" style={{ fontSize: 12, color: "var(--mut)" }}>{model.free ? "Free" : model.priceKnown === false ? "n/a" : `${perM(model.promptPerM)}/M`}</span>
           </div>
         )}
       </Step>
