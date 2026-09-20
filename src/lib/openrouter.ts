@@ -13,6 +13,21 @@
 
 const BASE = "https://openrouter.ai/api/v1";
 
+/**
+ * Inference backend. Defaults to OpenRouter, but can be pointed at any
+ * OpenAI-compatible gateway — notably Orbio (https://api.orbio.so/api/v1),
+ * whose CREDIT token (1 CREDIT = $1 of AI usage) lives on Robinhood Chain, so a
+ * creator's claimed ETH fees can be swapped into CREDIT and spent here. Set
+ * INFERENCE_BASE_URL + INFERENCE_API_KEY to switch; the public model CATALOG and
+ * OpenRouter credit/top-up endpoints stay on OpenRouter (they're OR-specific).
+ */
+function inferenceBase(): string {
+  return process.env.INFERENCE_BASE_URL?.trim() || BASE;
+}
+function inferenceKey(): string | undefined {
+  return process.env.INFERENCE_API_KEY?.trim() || process.env.OPENROUTER_API_KEY?.trim();
+}
+
 export interface ORModel {
   id: string;
   name: string;
@@ -89,17 +104,17 @@ export async function findModel(id: string): Promise<ORModel | null> {
 }
 
 export function hasKey(): boolean {
-  return !!process.env.OPENROUTER_API_KEY?.trim();
+  return !!inferenceKey();
 }
 
 function authHeaders(): Record<string, string> {
-  const key = process.env.OPENROUTER_API_KEY?.trim();
+  const key = inferenceKey();
   const headers: Record<string, string> = {
     Authorization: `Bearer ${key}`,
     "Content-Type": "application/json",
   };
   const referer = process.env.OPENROUTER_APP_URL?.trim();
-  const title = process.env.OPENROUTER_APP_TITLE?.trim() || "LLMPad";
+  const title = process.env.OPENROUTER_APP_TITLE?.trim() || "Neuma";
   if (referer) headers["HTTP-Referer"] = referer;
   headers["X-Title"] = title;
   return headers;
@@ -126,7 +141,7 @@ export interface ChatOptions {
 export async function chat(model: string, messages: ChatMessage[], opts?: ChatOptions): Promise<ChatResult> {
   if (!hasKey()) throw new Error("NO_KEY");
 
-  const res = await fetch(`${BASE}/chat/completions`, {
+  const res = await fetch(`${inferenceBase()}/chat/completions`, {
     method: "POST",
     headers: authHeaders(),
     body: JSON.stringify({ model, messages, temperature: opts?.temperature, usage: { include: true } }),
@@ -166,7 +181,7 @@ export async function chat(model: string, messages: ChatMessage[], opts?: ChatOp
  */
 export async function streamChat(model: string, messages: ChatMessage[], opts?: ChatOptions): Promise<Response> {
   if (!hasKey()) throw new Error("NO_KEY");
-  return fetch(`${BASE}/chat/completions`, {
+  return fetch(`${inferenceBase()}/chat/completions`, {
     method: "POST",
     headers: authHeaders(),
     body: JSON.stringify({ model, messages, temperature: opts?.temperature, stream: true, usage: { include: true } }),
@@ -208,7 +223,7 @@ export async function chatWithTools(
   opts?: ChatOptions
 ): Promise<ToolTurn> {
   if (!hasKey()) throw new Error("NO_KEY");
-  const res = await fetch(`${BASE}/chat/completions`, {
+  const res = await fetch(`${inferenceBase()}/chat/completions`, {
     method: "POST",
     headers: authHeaders(),
     body: JSON.stringify({
