@@ -101,8 +101,16 @@ function AgentCard({ it }: { it: Item }) {
     <Link href={`/token/${it.token}`} className="agent-card">
       {/* Art */}
       <div style={{ position: "relative", aspectRatio: "1 / 1", background: `radial-gradient(120% 120% at 30% 12%, ${p.color}2e, transparent 60%), var(--card-2)`, display: "grid", placeItems: "center", overflow: "hidden" }}>
-        <div style={{ position: "absolute", top: 8, left: 8, zIndex: 2 }}><RhBadge /></div>
-        {hasModel && <span className="badge" style={{ position: "absolute", top: 8, right: 8, zIndex: 2, padding: "3px 7px", fontSize: 10 }}>{p.name}</span>}
+        <div style={{ position: "absolute", top: 8, left: 8, zIndex: 2 }}>
+          {hasModel ? (
+            <span className="badge" style={{ paddingLeft: 4, padding: "3px 8px 3px 4px", fontSize: 10.5 }}>
+              <ModelLogo model={it.model ?? undefined} size={14} radius={4} />
+              {p.name}
+            </span>
+          ) : (
+            <RhBadge />
+          )}
+        </div>
         {it.logo && imgOk ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={it.logo} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={() => setImgOk(false)} />
