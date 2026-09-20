@@ -148,8 +148,22 @@ export function DeployButton({
     );
   }
 
+  const wrongChain = isConnected && chainId !== robinhoodChain.id;
+
   return (
     <div className="flex flex-col gap-3">
+      {wrongChain && (
+        <div className="notice" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, fontSize: 12.5 }}>
+          <span>Wallet is on the wrong network.</span>
+          <button
+            className="btn btn-cream"
+            style={{ padding: "7px 14px", fontSize: 13 }}
+            onClick={() => switchChainAsync({ chainId: robinhoodChain.id }).catch(() => {})}
+          >
+            Switch to Robinhood Chain
+          </button>
+        </div>
+      )}
       {warnings.map((w, i) => (<p key={i} className="notice" style={{ fontSize: 12.5 }}>⚠️ {w}</p>))}
       {error && <p className="notice" style={{ borderColor: "rgba(239,122,124,.4)", background: "rgba(239,122,124,.08)", color: "var(--red)", fontSize: 12.5 }}>{error}</p>}
       <button onClick={launch} disabled={disabled} className="btn btn-cream" style={{ width: "100%", padding: 15 }}>

@@ -67,7 +67,7 @@ export default function ExplorePage() {
 
       {/* Grid */}
       {items === null ? (
-        <Grid>{Array.from({ length: 6 }).map((_, i) => <div key={i} className="card" style={{ height: 300, opacity: 0.5 }} />)}</Grid>
+        <Grid>{Array.from({ length: 8 }).map((_, i) => <div key={i} className="agent-card" style={{ height: 232, opacity: 0.45 }} />)}</Grid>
       ) : list.length === 0 ? (
         <div className="card" style={{ padding: 48, textAlign: "center", color: "var(--mut)" }}>
           No agents yet. <Link href="/create" style={{ color: "var(--text)", textDecoration: "underline" }}>Launch the first →</Link>
@@ -80,7 +80,7 @@ export default function ExplorePage() {
 }
 
 function Grid({ children }: { children: React.ReactNode }) {
-  return <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>{children}</div>;
+  return <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(178px, 1fr))", gap: 12 }}>{children}</div>;
 }
 
 function initials(s?: string | null): string {
@@ -89,7 +89,7 @@ function initials(s?: string | null): string {
 function hashHsl(s: string): string {
   let h = 0;
   for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360;
-  return `hsl(${h}, 48%, 40%)`;
+  return `hsl(${h}, 46%, 40%)`;
 }
 
 function AgentCard({ it }: { it: Item }) {
@@ -98,40 +98,37 @@ function AgentCard({ it }: { it: Item }) {
   const [imgOk, setImgOk] = useState(true);
   const mono = initials(it.ticker ?? it.agentName);
   return (
-    <Link href={`/token/${it.token}`} className="card" style={{ overflow: "hidden", display: "block" }}>
+    <Link href={`/token/${it.token}`} className="agent-card">
       {/* Art */}
-      <div style={{ position: "relative", aspectRatio: "1 / 1", background: `radial-gradient(130% 130% at 30% 15%, ${p.color}33, transparent 62%), var(--card-2)`, display: "grid", placeItems: "center", borderBottom: "1px solid var(--border)" }}>
-        <div style={{ position: "absolute", top: 12, left: 12, display: "flex", gap: 6 }}>
-          <RhBadge />
-          {hasModel && <span className="badge">{p.name}</span>}
-        </div>
+      <div style={{ position: "relative", aspectRatio: "1 / 1", background: `radial-gradient(120% 120% at 30% 12%, ${p.color}2e, transparent 60%), var(--card-2)`, display: "grid", placeItems: "center", overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: 8, left: 8, zIndex: 2 }}><RhBadge /></div>
+        {hasModel && <span className="badge" style={{ position: "absolute", top: 8, right: 8, zIndex: 2, padding: "3px 7px", fontSize: 10 }}>{p.name}</span>}
         {it.logo && imgOk ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={it.logo} alt="" style={{ width: "62%", aspectRatio: "1", borderRadius: 22, objectFit: "cover" }} onError={() => setImgOk(false)} />
+          <img src={it.logo} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={() => setImgOk(false)} />
         ) : hasModel ? (
-          <ModelLogo model={it.model ?? undefined} size={118} radius={26} />
+          <ModelLogo model={it.model ?? undefined} size={78} radius={20} />
         ) : (
-          <div style={{ width: "56%", aspectRatio: "1", borderRadius: 22, background: hashHsl(mono), display: "grid", placeItems: "center", color: "#fff", fontWeight: 800, fontSize: 40 }}>{mono}</div>
+          <div style={{ width: "52%", aspectRatio: "1", borderRadius: 18, background: hashHsl(mono), display: "grid", placeItems: "center", color: "#fff", fontWeight: 800, fontSize: 30 }}>{mono}</div>
         )}
-        <span style={{ position: "absolute", bottom: 12, left: 12 }} className="badge">fees → compute</span>
       </div>
       {/* Meta */}
-      <div style={{ padding: 16 }}>
+      <div style={{ padding: "11px 12px 12px" }}>
         <div className="flex items-baseline justify-between gap-2">
-          <span style={{ fontWeight: 700, fontSize: 18, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{it.agentName ?? "Agent"}</span>
-          <span className="mono" style={{ color: "var(--dim)", fontSize: 13, flexShrink: 0 }}>${it.ticker ?? "—"}</span>
+          <span style={{ fontWeight: 700, fontSize: 14.5, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{it.agentName ?? "Agent"}</span>
+          <span className="mono" style={{ color: "var(--dim)", fontSize: 11.5, flexShrink: 0 }}>${it.ticker ?? "—"}</span>
         </div>
         {it.model ? (
-          <div className="mono flex items-center gap-2" style={{ marginTop: 8, color: "var(--mut)", fontSize: 12.5 }}>
-            <ModelLogo model={it.model} size={18} radius={5} />
+          <div className="mono flex items-center gap-1.5" style={{ marginTop: 7, color: "var(--mut)", fontSize: 11 }}>
+            <ModelLogo model={it.model} size={14} radius={4} />
             <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{it.modelName ?? modelTail(it.model)}</span>
           </div>
         ) : (
-          <div className="mono" style={{ marginTop: 8, color: "var(--dim)", fontSize: 12.5 }}>Robinhood Chain token</div>
+          <div className="mono" style={{ marginTop: 7, color: "var(--dim)", fontSize: 11 }}>Robinhood Chain token</div>
         )}
-        <div className="mono flex items-center justify-between" style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid var(--border)", color: "var(--dim)", fontSize: 12 }}>
-          <span>{shortAddr(it.token)}</span>
-          <span>by {shortAddr(it.deployer)}</span>
+        <div className="flex items-center justify-between" style={{ marginTop: 10, paddingTop: 9, borderTop: "1px solid var(--border)" }}>
+          <span style={{ fontSize: 9.5, fontWeight: 600, letterSpacing: ".03em", textTransform: "uppercase", color: "var(--cream)" }}>fees → compute</span>
+          <span className="mono" style={{ fontSize: 10.5, color: "var(--dim)" }}>{shortAddr(it.token)}</span>
         </div>
       </div>
     </Link>

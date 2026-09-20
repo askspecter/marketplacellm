@@ -14,7 +14,7 @@ export function Header() {
           <span style={{ fontWeight: 700, fontSize: 19, letterSpacing: "-.02em" }}>{SITE.name}</span>
         </Link>
         <div className="ml-auto" style={{ flexShrink: 0 }}>
-          <ConnectButton accountStatus="address" chainStatus="none" showBalance={false} label="Connect" />
+          <ConnectButton accountStatus="address" chainStatus="icon" showBalance={false} label="Connect" />
         </div>
       </div>
     </header>
