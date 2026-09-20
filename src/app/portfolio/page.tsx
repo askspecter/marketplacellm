@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAccount } from "wagmi";
 import { formatUnits } from "viem";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { ConnectWallet } from "@/components/ConnectWallet";
 import { ClaimFees } from "@/components/ClaimFees";
 import { shortAddr, usd } from "@/lib/format";
 import { SITE } from "@/lib/site";
@@ -60,7 +60,7 @@ export default function PortfolioPage() {
         <div className="card" style={{ marginTop: 30, padding: 40, textAlign: "center" }}>
           <p style={{ marginBottom: 16, color: "var(--mut)" }}>Connect a wallet to see your portfolio.</p>
           <div className="flex justify-center">
-            <ConnectButton label="Connect wallet" />
+            <ConnectWallet label="Connect wallet" />
           </div>
         </div>
       ) : (

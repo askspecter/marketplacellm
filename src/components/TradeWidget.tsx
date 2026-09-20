@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useAccount, useChainId, useSwitchChain, useWriteContract } from "wagmi";
 import { parseEther, parseUnits, formatUnits, type Abi } from "viem";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { ConnectWallet } from "@/components/ConnectWallet";
 import { v2CurveAbi } from "@/lib/pons/abisV2";
 import { quoteBuy, quoteSell, withSlippage, type CurveQuoteInputs } from "@/lib/pons/quote";
 import { robinhoodChain } from "@/lib/chain";
@@ -106,7 +106,7 @@ export function TradeWidget({ curve, token, tokenSymbol, quoteIsNative, quoteDec
             {busy ? "Submitting…" : side === "buy" ? `Buy ${tokenSymbol}` : `Sell ${tokenSymbol}`}
           </button>
         ) : (
-          <div className="flex justify-center"><ConnectButton label="Connect wallet to trade" /></div>
+          <div className="flex justify-center"><ConnectWallet label="Connect wallet to trade" /></div>
         )}
       </div>
       <p style={{ marginTop: 10, textAlign: "center", fontSize: 11, color: "var(--dim)" }}>3% slippage · pair {quoteSymbol} · non-custodial</p>

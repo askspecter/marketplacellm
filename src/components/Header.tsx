@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { ConnectWallet } from "@/components/ConnectWallet";
 import { SITE } from "@/lib/site";
 
 export function Header() {
@@ -14,7 +14,7 @@ export function Header() {
           <span style={{ fontWeight: 700, fontSize: 18, letterSpacing: "-.02em" }}>{SITE.name}</span>
         </Link>
         <div className="ml-auto" style={{ flexShrink: 0 }}>
-          <ConnectButton accountStatus="address" chainStatus="icon" showBalance={false} label="Connect" />
+          <ConnectWallet label="Connect" compact />
         </div>
       </div>
     </header>

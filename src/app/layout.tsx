@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import "@rainbow-me/rainbowkit/styles.css"; // before globals — styles the connect modal
 import "./globals.css";
 import { Providers } from "./providers";
 import { Header } from "@/components/Header";
@@ -25,7 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "(function(){try{var V='llmpad-wallet-reset-1';if(localStorage.getItem('llmpad.walletReset')===V)return;var kill=/^(wagmi|wc@2|walletconnect|WALLETCONNECT|rk-|@rainbow|W3M|WCM|@w3m|@appkit|reown|@reown|CBWSDK|-walletlink)/i;Object.keys(localStorage).forEach(function(k){if(kill.test(k))localStorage.removeItem(k)});localStorage.setItem('llmpad.walletReset',V)}catch(e){}})();",
+              "(function(){try{var V='llmpad-wallet-reset-2';if(localStorage.getItem('llmpad.walletReset')===V)return;var kill=/^(wagmi|wc@2|walletconnect|WALLETCONNECT|rk-|@rainbow|W3M|WCM|@w3m|@appkit|reown|@reown|CBWSDK|-walletlink)/i;Object.keys(localStorage).forEach(function(k){if(kill.test(k))localStorage.removeItem(k)});localStorage.setItem('llmpad.walletReset',V)}catch(e){}})();",
           }}
         />
         <link rel="preconnect" href="https://fonts.googleapis.com" />

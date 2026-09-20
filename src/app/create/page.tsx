@@ -16,6 +16,9 @@ export default function CreatePage() {
   const [name, setName] = useState("");
   const [ticker, setTicker] = useState("");
   const [bio, setBio] = useState("");
+  const [twitter, setTwitter] = useState("");
+  const [telegram, setTelegram] = useState("");
+  const [website, setWebsite] = useState("");
   const [personality, setPersonality] = useState("");
   const [temperature, setTemperature] = useState(0.7);
   const [model, setModel] = useState<PickerModel | null>(null);
@@ -112,6 +115,14 @@ export default function CreatePage() {
         <div style={{ height: 14 }} />
         <Label>Bio <span style={{ color: "var(--dim)", fontWeight: 400 }}>optional</span></Label>
         <textarea className="input" value={bio} onChange={(e) => setBio(e.target.value)} maxLength={280} rows={2} placeholder="What's the idea? Tell holders about your agent." style={{ resize: "none" }} />
+
+        <div style={{ height: 16 }} />
+        <Label>Socials <span style={{ color: "var(--dim)", fontWeight: 400 }}>optional · written on-chain</span></Label>
+        <div className="flex flex-col" style={{ gap: 10 }}>
+          <SocialInput icon="𝕏" prefix="x.com/" value={twitter} onChange={setTwitter} placeholder="handle" />
+          <SocialInput icon="✈" prefix="t.me/" value={telegram} onChange={setTelegram} placeholder="channel" />
+          <SocialInput icon="🌐" value={website} onChange={setWebsite} placeholder="https://yoursite.xyz" />
+        </div>
       </Step>
 
       {/* 02 — Brain */}
@@ -153,7 +164,7 @@ export default function CreatePage() {
         <Label>Dev buy <span style={{ color: "var(--dim)", fontWeight: 400 }}>optional · ETH</span></Label>
         <input className="input mono" value={devBuy} onChange={(e) => setDevBuy(e.target.value.replace(/[^0-9.]/g, ""))} inputMode="decimal" placeholder="e.g. 0.05" />
         <div style={{ margin: "14px 0", fontSize: 13, color: "var(--dim)" }}>No launch fee right now — you pay only gas. Live on Robinhood Chain; your wallet submits the transaction.</div>
-        <DeployButton name={name} ticker={ticker} description={bio} imageUri={chainLogo} logo={image} model={model} personality={personality} temperature={temperature} initialBuyEth={devBuy} />
+        <DeployButton name={name} ticker={ticker} description={bio} imageUri={chainLogo} logo={image} twitter={twitter} telegram={telegram} website={website} model={model} personality={personality} temperature={temperature} initialBuyEth={devBuy} />
       </Step>
 
       {/* Live preview */}
@@ -231,4 +242,20 @@ function Step({ n, icon, title, sub, children }: { n: string; icon: string; titl
 
 function Label({ children }: { children: React.ReactNode }) {
   return <span style={{ display: "block", fontSize: 14, fontWeight: 500, marginBottom: 8 }}>{children}</span>;
+}
+
+function SocialInput({ icon, prefix, value, onChange, placeholder }: { icon: string; prefix?: string; value: string; onChange: (v: string) => void; placeholder: string }) {
+  return (
+    <div className="flex items-center" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)", borderRadius: 14, paddingLeft: 14, overflow: "hidden" }}>
+      <span style={{ fontSize: 15, width: 22, textAlign: "center", color: "var(--mut)", flexShrink: 0 }}>{icon}</span>
+      {prefix && <span className="mono" style={{ fontSize: 13.5, color: "var(--dim)", flexShrink: 0, paddingLeft: 6 }}>{prefix}</span>}
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        maxLength={120}
+        placeholder={placeholder}
+        style={{ flex: 1, minWidth: 0, background: "transparent", border: "none", outline: "none", color: "var(--text)", fontSize: 15, padding: "13px 16px 13px 8px", fontFamily: "var(--font-ui)" }}
+      />
+    </div>
+  );
 }

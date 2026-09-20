@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAccount, useChainId, useSwitchChain, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { parseEventLogs, type Abi } from "viem";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { ConnectWallet } from "@/components/ConnectWallet";
 import { getStrategy } from "@/lib/pons";
 import { v2TokenLaunchedEvent } from "@/lib/pons/abisV2";
 import { robinhoodChain } from "@/lib/chain";
@@ -17,6 +17,9 @@ export function DeployButton({
   description,
   imageUri,
   logo,
+  twitter,
+  telegram,
+  website,
   model,
   personality,
   temperature,
@@ -30,6 +33,10 @@ export function DeployButton({
   imageUri: string;
   /** Full-resolution image stored off-chain (shown across the UI). */
   logo?: string;
+  /** Optional socials, written into the token's on-chain metadata. */
+  twitter?: string;
+  telegram?: string;
+  website?: string;
   model: PickerModel | null;
   personality?: string;
   temperature?: number;
@@ -108,6 +115,9 @@ export function DeployButton({
           description: description.trim(),
           imageUri,
           quoteAsset: "ETH",
+          twitter: twitter?.trim() || undefined,
+          telegram: telegram?.trim() || undefined,
+          website: website?.trim() || undefined,
           initialBuyEth: initialBuyEth && Number(initialBuyEth) > 0 ? initialBuyEth : undefined,
         },
         address
@@ -135,7 +145,7 @@ export function DeployButton({
     return (
       <div className="card-2" style={{ padding: 16, textAlign: "center" }}>
         <p style={{ marginBottom: 12, fontSize: 14, color: "var(--mut)" }}>Connect a wallet on Robinhood Chain to launch.</p>
-        <div className="flex justify-center"><ConnectButton label="Connect wallet" /></div>
+        <div className="flex justify-center"><ConnectWallet label="Connect wallet" /></div>
       </div>
     );
   }
