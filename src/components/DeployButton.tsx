@@ -153,7 +153,7 @@ export function DeployButton({
   if (phase === "done") {
     return (
       <div className="card-2" style={{ padding: 16, textAlign: "center", borderColor: "rgba(116,200,138,.4)" }}>
-        <div style={{ fontSize: 18, fontWeight: 700, color: "var(--green)" }}>Launched 🎉</div>
+        <div style={{ fontSize: 18, fontWeight: 700, color: "var(--green)" }}>Launched</div>
         {launchedToken ? (
           <a href={`/token/${launchedToken}`} style={{ marginTop: 4, display: "inline-block", fontSize: 14, color: "var(--cream)" }}>Open the agent →</a>
         ) : (
@@ -179,7 +179,7 @@ export function DeployButton({
           </button>
         </div>
       )}
-      {warnings.map((w, i) => (<p key={i} className="notice" style={{ fontSize: 12.5 }}>⚠️ {w}</p>))}
+      {warnings.map((w, i) => (<p key={i} className="notice" style={{ fontSize: 12.5 }}>{w}</p>))}
       {error && <p className="notice" style={{ borderColor: "rgba(239,122,124,.4)", background: "rgba(239,122,124,.08)", color: "var(--red)", fontSize: 12.5 }}>{error}</p>}
       <button onClick={launch} disabled={disabled} className="btn btn-cream" style={{ width: "100%", padding: 15 }}>
         {phase === "preparing" && "Preparing launch…"}

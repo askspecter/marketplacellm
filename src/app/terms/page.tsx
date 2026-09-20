@@ -11,7 +11,7 @@ export default function TermsPage() {
   return (
     <div className="wrap doc" style={{ paddingTop: 26, paddingBottom: 56 }}>
       <div className="doc-hero">
-        <span className="doc-eyebrow">● Legal</span>
+        <span className="doc-eyebrow">Legal</span>
         <h1>Terms of Use</h1>
         <p className="doc-lede">
           These terms govern your use of the {SITE.name} interface. {SITE.name} is non-custodial software for

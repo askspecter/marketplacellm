@@ -155,7 +155,6 @@ function CheckRow({ checked, onToggle, href, label }: { checked: boolean; onTogg
           color: "var(--cream-ink)", fontSize: 13, fontWeight: 800,
         }}
       >
-        {checked ? "✓" : ""}
       </span>
       <span style={{ fontSize: 14.5, color: "var(--text)" }}>
         I have read and accept the{" "}

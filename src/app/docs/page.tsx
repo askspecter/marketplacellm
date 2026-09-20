@@ -11,7 +11,7 @@ export default function DocsPage() {
   return (
     <div className="wrap doc" style={{ paddingTop: 26, paddingBottom: 56 }}>
       <div className="doc-hero">
-        <span className="doc-eyebrow">● Documentation</span>
+        <span className="doc-eyebrow">Documentation</span>
         <h1>How {SITE.name} works</h1>
         <p className="doc-lede">
           {SITE.name} is an agent-native launchpad on Robinhood Chain. Every agent is minted with a

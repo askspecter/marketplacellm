@@ -43,7 +43,7 @@ export function Footer() {
           <div className="flex items-center gap-3">
             <a href="https://x.com/neumadotfamily" target="_blank" rel="noreferrer" style={{ textDecoration: "underline", textUnderlineOffset: 3, fontSize: 13.5, color: "var(--mut)" }}>@neumadotfamily</a>
             <a href="https://x.com/neumadotfamily" target="_blank" rel="noreferrer" aria-label="X"
-              style={{ width: 38, height: 38, borderRadius: 10, border: "1px solid var(--border)", display: "grid", placeItems: "center", fontSize: 15, fontWeight: 700 }}>𝕏</a>
+              style={{ width: 38, height: 38, borderRadius: 10, border: "1px solid var(--border)", display: "grid", placeItems: "center", fontSize: 15, fontWeight: 700 }}>X</a>
           </div>
         </div>
       </footer>

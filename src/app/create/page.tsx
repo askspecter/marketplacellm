@@ -64,8 +64,8 @@ export default function CreatePage() {
     <div className="wrap" style={{ paddingTop: 22, paddingBottom: 48, maxWidth: 760 }}>
       <h1 style={{ fontSize: 30, fontWeight: 700, letterSpacing: "-.02em", marginBottom: 18 }}>Launch an agent</h1>
 
-      {/* 01 — Identity */}
-      <Step n="01" icon="✦" title="Your agent" sub="A name, a ticker and a face. Everything else is optional.">
+      {/* 01 Identity */}
+      <Step n="01" title="Your agent" sub="A name, a ticker and a face. Everything else is optional.">
         <div
           onClick={() => fileRef.current?.click()}
           onDragOver={(e) => e.preventDefault()}
@@ -77,8 +77,7 @@ export default function CreatePage() {
             <img src={image} alt="" style={{ width: 96, height: 96, borderRadius: 18, objectFit: "cover" }} />
           ) : (
             <div style={{ textAlign: "center", color: "var(--mut)" }}>
-              <div style={{ fontSize: 22 }}>⬆</div>
-              <div style={{ fontWeight: 600, color: "var(--text)", marginTop: 6 }}>Add agent image</div>
+              <div style={{ fontWeight: 600, color: "var(--text)" }}>Add agent image</div>
               <div style={{ fontSize: 12.5, marginTop: 4 }}>Click to browse or drop · PNG · JPG · GIF · WEBP</div>
               <div style={{ fontSize: 11.5, marginTop: 6, color: "var(--dim)" }}>Leave empty to use the model’s badge as the face.</div>
             </div>
@@ -101,14 +100,14 @@ export default function CreatePage() {
         <div style={{ height: 16 }} />
         <Label>Socials <span style={{ color: "var(--dim)", fontWeight: 400 }}>optional · written on-chain</span></Label>
         <div className="flex flex-col" style={{ gap: 10 }}>
-          <SocialInput icon="𝕏" prefix="x.com/" value={twitter} onChange={setTwitter} placeholder="handle" />
-          <SocialInput icon="✈" prefix="t.me/" value={telegram} onChange={setTelegram} placeholder="channel" />
-          <SocialInput icon="🌐" value={website} onChange={setWebsite} placeholder="https://yoursite.xyz" />
+          <SocialInput icon="X" prefix="x.com/" value={twitter} onChange={setTwitter} placeholder="handle" />
+          <SocialInput icon="TG" prefix="t.me/" value={telegram} onChange={setTelegram} placeholder="channel" />
+          <SocialInput icon="WEB" value={website} onChange={setWebsite} placeholder="https://yoursite.xyz" />
         </div>
       </Step>
 
-      {/* 02 — Brain */}
-      <Step n="02" icon="◍" title="Pick a brain" sub="The @orbiodotso model your agent thinks with. Paired with ETH on a single pool.">
+      {/* 02 Brain */}
+      <Step n="02" title="Pick a brain" sub="The @orbiodotso model your agent thinks with. Paired with ETH on a single pool.">
         <ModelPicker value={model} onChange={setModel} />
         {model && (
           <div className="card-2 flex items-center gap-3" style={{ padding: 14, marginTop: 12 }}>
@@ -122,8 +121,8 @@ export default function CreatePage() {
         )}
       </Step>
 
-      {/* 03 — Personality & behavior */}
-      <Step n="03" icon="⚙" title="Personality & behavior" sub="How your agent talks and thinks. Trading fees fund the compute that runs it.">
+      {/* 03 Personality & behavior */}
+      <Step n="03" title="Personality & behavior" sub="How your agent talks and thinks. Trading fees fund the compute that runs it.">
         <div className="flex items-center justify-between">
           <Label>Personality (system prompt)</Label>
           <button type="button" onClick={fillTemplate} style={{ background: "none", border: "none", color: "var(--cream)", fontSize: 13, cursor: "pointer" }}>Use template</button>
@@ -141,8 +140,8 @@ export default function CreatePage() {
         </div>
       </Step>
 
-      {/* 04 — Dev buy & launch */}
-      <Step n="04" icon="◗" title="Dev buy & launch" sub="An optional opening buy that lands in the same transaction, so nobody gets in before you.">
+      {/* 04 Dev buy & launch */}
+      <Step n="04" title="Dev buy & launch" sub="An optional opening buy that lands in the same transaction, so nobody gets in before you.">
         <Label>Dev buy <span style={{ color: "var(--dim)", fontWeight: 400 }}>optional · ETH</span></Label>
         <input className="input mono" value={devBuy} onChange={(e) => setDevBuy(e.target.value.replace(/[^0-9.]/g, ""))} inputMode="decimal" placeholder="e.g. 0.05" />
         <div style={{ margin: "14px 0", fontSize: 13, color: "var(--dim)" }}>No launch fee right now - you pay only gas. Live on Robinhood Chain; your wallet submits the transaction.</div>
@@ -151,7 +150,7 @@ export default function CreatePage() {
 
       {/* Live preview */}
       <div className="flex items-center justify-between" style={{ margin: "26px 4px 12px" }}>
-        <span className="mono" style={{ fontSize: 12, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--mut)" }}>● Live preview</span>
+        <span className="mono" style={{ fontSize: 12, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--mut)" }}>Live preview</span>
         <span style={{ fontSize: 12.5, color: "var(--dim)" }}>how it shows on Explore</span>
       </div>
 
@@ -204,16 +203,13 @@ function PRow({ k, v }: { k: string; v: string }) {
   );
 }
 
-function Step({ n, icon, title, sub, children }: { n: string; icon: string; title: string; sub: string; children: React.ReactNode }) {
+function Step({ n, title, sub, children }: { n: string; title: string; sub: string; children: React.ReactNode }) {
   return (
     <div className="card" style={{ padding: 22, marginBottom: 16 }}>
       <div className="flex items-start gap-3" style={{ marginBottom: 18 }}>
-        <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--card-2)", border: "1px solid var(--border)", display: "grid", placeItems: "center", fontSize: 18, flexShrink: 0 }}>{icon}</div>
+        <div className="mono" style={{ width: 44, height: 44, borderRadius: 12, background: "var(--card-2)", border: "1px solid var(--border)", display: "grid", placeItems: "center", fontSize: 15, fontWeight: 700, color: "var(--dim)", flexShrink: 0 }}>{n}</div>
         <div style={{ flex: 1 }}>
-          <div className="flex items-center justify-between">
-            <span style={{ fontWeight: 700, fontSize: 19 }}>{title}</span>
-            <span className="mono" style={{ color: "var(--dim)", fontSize: 13 }}>{n}</span>
-          </div>
+          <span style={{ fontWeight: 700, fontSize: 19 }}>{title}</span>
           <p style={{ marginTop: 4, color: "var(--mut)", fontSize: 14, lineHeight: 1.5 }}>{sub}</p>
         </div>
       </div>
@@ -229,7 +225,7 @@ function Label({ children }: { children: React.ReactNode }) {
 function SocialInput({ icon, prefix, value, onChange, placeholder }: { icon: string; prefix?: string; value: string; onChange: (v: string) => void; placeholder: string }) {
   return (
     <div className="flex items-center" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)", borderRadius: 14, paddingLeft: 14, overflow: "hidden" }}>
-      <span style={{ fontSize: 15, width: 22, textAlign: "center", color: "var(--mut)", flexShrink: 0 }}>{icon}</span>
+      <span className="mono" style={{ fontSize: 11, fontWeight: 700, minWidth: 30, textAlign: "center", color: "var(--mut)", flexShrink: 0 }}>{icon}</span>
       {prefix && <span className="mono" style={{ fontSize: 13.5, color: "var(--dim)", flexShrink: 0, paddingLeft: 6 }}>{prefix}</span>}
       <input
         value={value}

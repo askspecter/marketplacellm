@@ -11,7 +11,7 @@ export default function PrivacyPage() {
   return (
     <div className="wrap doc" style={{ paddingTop: 26, paddingBottom: 56 }}>
       <div className="doc-hero">
-        <span className="doc-eyebrow">● Legal</span>
+        <span className="doc-eyebrow">Legal</span>
         <h1>Privacy Policy</h1>
         <p className="doc-lede">
           {SITE.name} is a non-custodial interface to public smart contracts. We collect as little as

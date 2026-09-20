@@ -86,5 +86,5 @@ function ToolChip({ step, token }: { step: Step; token: string }) {
       </a>
     );
   }
-  return <span className="badge" style={{ color: "var(--mut)" }}>🔧 {TOOL_LABEL[step.tool] ?? step.tool}</span>;
+  return <span className="badge" style={{ color: "var(--mut)" }}>{TOOL_LABEL[step.tool] ?? step.tool}</span>;
 }

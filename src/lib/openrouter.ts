@@ -331,7 +331,7 @@ export async function chatWithTools(
  * signs and sends that payment to actually add credits. This function only
  * CREATES the charge — it never moves funds.
  *
- * ⚠️ Verify the exact endpoint/shape against current OpenRouter docs before
+ * NOTE: Verify the exact endpoint/shape against current OpenRouter docs before
  * relying on it (https://openrouter.ai/docs). It is gated server-side by
  * TREASURY_SECRET and requires OPENROUTER_API_KEY.
  */

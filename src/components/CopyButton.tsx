@@ -66,7 +66,6 @@ export function CopyButton({
         flexShrink: 0,
       }}
     >
-      <span aria-hidden style={{ fontSize: compact ? 11 : 12 }}>{copied ? "✓" : "⧉"}</span>
       {copied ? copiedLabel : label}
     </button>
   );

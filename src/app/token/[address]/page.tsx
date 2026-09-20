@@ -195,7 +195,7 @@ export default function AgentPage({ params }: { params: { address: string } }) {
           {/* Creator-only: claim the fees this agent earned */}
           {isCreator && (
             <div className="flex flex-col" style={{ gap: 8 }}>
-              <span className="mono" style={{ fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--cream)" }}>◆ You created this agent</span>
+              <span className="mono" style={{ fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--cream)" }}>You created this agent</span>
               <ClaimFees />
             </div>
           )}

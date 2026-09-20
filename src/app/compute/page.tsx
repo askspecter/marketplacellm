@@ -22,7 +22,6 @@ export default function ComputePage() {
           {model ? <Chat model={model.id} modelName={model.name} /> : (
             <div className="card" style={{ display: "grid", placeItems: "center", minHeight: 320, textAlign: "center", padding: 28 }}>
               <div>
-                <div style={{ width: 52, height: 52, margin: "0 auto 12px", borderRadius: 15, background: "var(--card-2)", border: "1px solid var(--border)", display: "grid", placeItems: "center", fontSize: 22 }}>◍</div>
                 <div style={{ fontWeight: 600, fontSize: 16 }}>Pick a model to start</div>
                 <p style={{ marginTop: 6, fontSize: 13.5, color: "var(--mut)", maxWidth: "32ch", marginInline: "auto", lineHeight: 1.5 }}>Choose any @orbiodotso model to open a chat. Free models run at no cost.</p>
               </div>
