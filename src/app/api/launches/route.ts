@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { indexV2Launches } from "@/lib/pons/readerV2";
+import type { Address } from "viem";
+import { indexV2Launches, readTokenInfoV2 } from "@/lib/pons/readerV2";
 import { listLinks } from "@/lib/pool";
 
 export const runtime = "nodejs";
@@ -18,7 +19,7 @@ export async function GET() {
 
   let onchain: Awaited<ReturnType<typeof indexV2Launches>> = [];
   try {
-    onchain = await indexV2Launches({ limit: 36 });
+    onchain = await indexV2Launches({ limit: 18 });
   } catch {
     onchain = [];
   }
@@ -35,6 +36,7 @@ export async function GET() {
     agentName: string | null;
     ticker: string | null;
     bio: string | null;
+    logo: string | null;
   }
 
   const seen = new Set<string>();
@@ -54,6 +56,7 @@ export async function GET() {
       agentName: link?.agentName ?? null,
       ticker: link?.ticker ?? null,
       bio: link?.bio ?? null,
+      logo: null,
     };
   });
 
@@ -72,8 +75,25 @@ export async function GET() {
       agentName: l.agentName ?? null,
       ticker: l.ticker ?? null,
       bio: l.bio ?? null,
+      logo: null,
     });
   }
+
+  // Enrich items that have no local agent name with the token's on-chain
+  // name / symbol / logo, so foreign launches render with a real identity.
+  await Promise.allSettled(
+    feed.map(async (it) => {
+      if (it.agentName) return;
+      try {
+        const info = await readTokenInfoV2(it.token as Address);
+        it.agentName = info.name || it.agentName;
+        it.ticker = it.ticker ?? info.symbol ?? null;
+        it.logo = info.logo || null;
+      } catch {
+        /* leave nulls; the card falls back gracefully */
+      }
+    })
+  );
 
   return NextResponse.json({ count: feed.length, launches: feed });
 }

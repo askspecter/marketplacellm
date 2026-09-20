@@ -14,6 +14,7 @@ interface Item {
   agentName: string | null;
   ticker: string | null;
   bio: string | null;
+  logo: string | null;
 }
 
 type Tab = "trending" | "new";
@@ -83,27 +84,34 @@ function Grid({ children }: { children: React.ReactNode }) {
 
 function AgentCard({ it }: { it: Item }) {
   const p = providerFromId(it.model ?? undefined);
+  const hasModel = !!it.model;
   return (
     <Link href={`/token/${it.token}`} className="card" style={{ overflow: "hidden", display: "block" }}>
       {/* Art */}
-      <div style={{ position: "relative", aspectRatio: "1.35 / 1", background: `radial-gradient(120% 120% at 30% 20%, ${p.color}44, transparent 60%), var(--card-2)`, display: "grid", placeItems: "center", borderBottom: "1px solid var(--border)" }}>
+      <div style={{ position: "relative", aspectRatio: "1 / 1", background: `radial-gradient(130% 130% at 30% 15%, ${p.color}33, transparent 62%), var(--card-2)`, display: "grid", placeItems: "center", borderBottom: "1px solid var(--border)" }}>
         <div style={{ position: "absolute", top: 12, left: 12, display: "flex", gap: 6 }}>
           <span className="badge"><span className="dot" style={{ background: "#7fd18f", color: "#04140e" }}>◗</span> RH</span>
-          <span className="badge"><span className="dot" style={{ background: p.color, color: p.ink }}>{p.short}</span> {p.name}</span>
+          {hasModel && <span className="badge">{p.name}</span>}
         </div>
-        <ModelLogo model={it.model ?? undefined} size={92} radius={22} />
+        {it.logo ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={it.logo} alt="" style={{ width: "56%", aspectRatio: "1", borderRadius: 24, objectFit: "cover" }} onError={(e) => ((e.currentTarget.style.display = "none"))} />
+        ) : (
+          <ModelLogo model={it.model ?? undefined} size={116} radius={26} />
+        )}
         <span style={{ position: "absolute", bottom: 12, left: 12 }} className="badge">fees → compute</span>
       </div>
       {/* Meta */}
       <div style={{ padding: 16 }}>
         <div className="flex items-baseline justify-between gap-2">
-          <span style={{ fontWeight: 700, fontSize: 18 }}>{it.agentName ?? "Unnamed agent"}</span>
-          {it.ticker && <span className="mono" style={{ color: "var(--dim)", fontSize: 13 }}>${it.ticker}</span>}
+          <span style={{ fontWeight: 700, fontSize: 18, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{it.agentName ?? "Agent"}</span>
+          <span className="mono" style={{ color: "var(--dim)", fontSize: 13, flexShrink: 0 }}>${it.ticker ?? "—"}</span>
         </div>
-        <div className="mono" style={{ marginTop: 6, color: "var(--mut)", fontSize: 13, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-          {it.modelName ?? modelTail(it.model ?? "") ?? "— unlinked —"}
+        <div className="mono flex items-center gap-2" style={{ marginTop: 8, color: "var(--mut)", fontSize: 12.5 }}>
+          <ModelLogo model={it.model ?? undefined} size={18} radius={5} />
+          <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{it.modelName ?? (it.model ? modelTail(it.model) : "unlinked")}</span>
         </div>
-        <div className="mono flex items-center justify-between" style={{ marginTop: 14, color: "var(--dim)", fontSize: 12 }}>
+        <div className="mono flex items-center justify-between" style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid var(--border)", color: "var(--dim)", fontSize: 12 }}>
           <span>{shortAddr(it.token)}</span>
           <span>by {shortAddr(it.deployer)}</span>
         </div>
