@@ -40,12 +40,40 @@ const TABLE: Record<string, Provider> = {
   "nousresearch": { key: "nous", name: "Nous", color: "#7c5cff", ink: "#0b0620", short: "N", domain: "nousresearch.com" },
   "z-ai": { key: "zai", name: "Z.AI", color: "#3a7afe", ink: "#03102a", short: "Z", domain: "z.ai" },
   moonshotai: { key: "moonshot", name: "Moonshot", color: "#1f1f24", ink: "#f4f2ec", short: "K", domain: "moonshot.ai" },
+  nvidia: { key: "nvidia", name: "NVIDIA", color: "#76b900", ink: "#0b1400", short: "N", domain: "nvidia.com" },
+  amazon: { key: "amazon", name: "Amazon", color: "#ff9900", ink: "#1a1000", short: "A", domain: "aws.amazon.com" },
+  ai21: { key: "ai21", name: "AI21", color: "#e23b3b", ink: "#1a0303", short: "AI", domain: "ai21.com" },
+  "01-ai": { key: "yi", name: "01.AI", color: "#003425", ink: "#eafff5", short: "Yi", domain: "01.ai" },
+  databricks: { key: "databricks", name: "Databricks", color: "#ff3621", ink: "#1a0300", short: "DB", domain: "databricks.com" },
+  inflection: { key: "inflection", name: "Inflection", color: "#111", ink: "#fff", short: "IN", domain: "inflection.ai" },
+  liquid: { key: "liquid", name: "Liquid", color: "#0b6", ink: "#021", short: "LQ", domain: "liquid.ai" },
+  minimax: { key: "minimax", name: "MiniMax", color: "#e8471c", ink: "#1a0400", short: "MM", domain: "minimax.io" },
+  baidu: { key: "baidu", name: "Baidu", color: "#2932e1", ink: "#fff", short: "B", domain: "baidu.com" },
+  tencent: { key: "tencent", name: "Tencent", color: "#1471ff", ink: "#fff", short: "T", domain: "tencent.com" },
+  stepfun: { key: "stepfun", name: "StepFun", color: "#2f6bff", ink: "#fff", short: "SF", domain: "stepfun.com" },
+  reka: { key: "reka", name: "Reka", color: "#ff5a5f", ink: "#1a0304", short: "R", domain: "reka.ai" },
+  inception: { key: "inception", name: "Inception", color: "#6d5cff", ink: "#fff", short: "IN", domain: "inceptionlabs.ai" },
+  "amazon-bedrock": { key: "amazon", name: "Amazon", color: "#ff9900", ink: "#1a1000", short: "A", domain: "aws.amazon.com" },
 };
+
+// Deterministic pleasant color from a string (for unknown providers).
+function hashColor(s: string): string {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360;
+  return `hsl(${h}, 52%, 42%)`;
+}
+function prettify(s: string): string {
+  return s.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
 
 export function providerFromId(modelId?: string): Provider {
   if (!modelId) return DEFAULT;
-  const prefix = modelId.includes("/") ? modelId.split("/")[0] : modelId;
-  return TABLE[prefix.toLowerCase()] ?? { ...DEFAULT, name: prefix, short: prefix.slice(0, 2).toUpperCase() };
+  const prefix = (modelId.includes("/") ? modelId.split("/")[0] : modelId).toLowerCase();
+  const known = TABLE[prefix];
+  if (known) return known;
+  // Unknown provider → a distinct, deterministic monogram (never a flat "AI").
+  const letters = prefix.replace(/[^a-z0-9]/g, "").slice(0, 2).toUpperCase() || "AI";
+  return { key: prefix, name: prettify(prefix), color: hashColor(prefix), ink: "#f7f7f5", short: letters };
 }
 
 /** A concise model label, e.g. "claude-3.5-sonnet" → "Claude 3.5 Sonnet"-ish tail. */

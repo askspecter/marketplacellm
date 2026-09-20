@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ModelLogo } from "@/components/ModelLogo";
+import { RhBadge } from "@/components/RhBadge";
 import { providerFromId, modelTail } from "@/lib/models";
 import { shortAddr } from "@/lib/format";
 
@@ -61,7 +62,7 @@ export default function ExplorePage() {
         <button className={`pill ${tab === "trending" ? "pill--active" : ""}`} onClick={() => setTab("trending")}>Trending</button>
         <button className={`pill ${tab === "new" ? "pill--active" : ""}`} onClick={() => setTab("new")}>New</button>
         <span style={{ width: 12 }} />
-        <span className="badge"><span className="dot" style={{ background: "#7fd18f", color: "#04140e" }}>◗</span> Robinhood</span>
+        <RhBadge label="Robinhood" />
       </div>
 
       {/* Grid */}
@@ -90,7 +91,7 @@ function AgentCard({ it }: { it: Item }) {
       {/* Art */}
       <div style={{ position: "relative", aspectRatio: "1 / 1", background: `radial-gradient(130% 130% at 30% 15%, ${p.color}33, transparent 62%), var(--card-2)`, display: "grid", placeItems: "center", borderBottom: "1px solid var(--border)" }}>
         <div style={{ position: "absolute", top: 12, left: 12, display: "flex", gap: 6 }}>
-          <span className="badge"><span className="dot" style={{ background: "#7fd18f", color: "#04140e" }}>◗</span> RH</span>
+          <RhBadge />
           {hasModel && <span className="badge">{p.name}</span>}
         </div>
         {it.logo ? (

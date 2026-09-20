@@ -13,7 +13,7 @@ export default function ComputePage() {
         Spend compute across any of OpenRouter’s 400+ models. On an agent page this is funded by that agent’s trading
         fees; here it runs against the platform key.
       </p>
-      <div className="mt-7 grid gap-4" style={{ gridTemplateColumns: "minmax(0,.9fr) minmax(0,1.1fr)" }}>
+      <div className="mt-7 split">
         <div>
           <span style={{ display: "block", fontSize: 14, color: "var(--mut)", marginBottom: 8 }}>Choose a model</span>
           <ModelPicker value={model} onChange={setModel} />

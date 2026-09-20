@@ -23,11 +23,32 @@ export default function CreatePage() {
   const [devBuy, setDevBuy] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
+  // Accept ANY image size: downscale to a small square on-canvas so the
+  // on-chain metadata stays tiny (no more size-limit rejection).
   function onFile(f?: File | null) {
     if (!f || !f.type.startsWith("image/")) return;
-    if (f.size > 600_000) { alert("Please use an image under ~600 KB."); return; }
     const r = new FileReader();
-    r.onload = () => setImage(String(r.result));
+    r.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 384;
+        const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+        const w = Math.max(1, Math.round(img.width * scale));
+        const h = Math.max(1, Math.round(img.height * scale));
+        const canvas = document.createElement("canvas");
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) { setImage(String(r.result)); return; }
+        ctx.drawImage(img, 0, 0, w, h);
+        try {
+          setImage(canvas.toDataURL("image/webp", 0.85));
+        } catch {
+          setImage(canvas.toDataURL("image/jpeg", 0.85));
+        }
+      };
+      img.onerror = () => setImage(String(r.result));
+      img.src = String(r.result);
+    };
     r.readAsDataURL(f);
   }
 

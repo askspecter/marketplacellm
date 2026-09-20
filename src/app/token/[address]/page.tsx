@@ -7,6 +7,7 @@ import { TradeWidget, type CurveInputsSerialized } from "@/components/TradeWidge
 import { PriceChart } from "@/components/PriceChart";
 import { AgentConsole } from "@/components/AgentConsole";
 import { ModelLogo } from "@/components/ModelLogo";
+import { RhBadge } from "@/components/RhBadge";
 import { providerFromId } from "@/lib/models";
 import { shortAddr, usd } from "@/lib/format";
 
@@ -59,7 +60,7 @@ export default function AgentPage({ params }: { params: { address: string } }) {
     <div className="wrap" style={{ paddingTop: 18, paddingBottom: 44 }}>
       <Link href="/" style={{ color: "var(--dim)", fontSize: 14 }}>← Explore</Link>
 
-      <div className="mt-4 grid gap-4" style={{ gridTemplateColumns: "minmax(0,1.3fr) minmax(0,1fr)" }}>
+      <div className="mt-4 split">
         {/* Left */}
         <div className="flex flex-col gap-4">
           {/* Header */}
@@ -70,7 +71,7 @@ export default function AgentPage({ params }: { params: { address: string } }) {
                 <div className="flex items-center gap-2" style={{ flexWrap: "wrap" }}>
                   <span style={{ fontWeight: 700, fontSize: 22 }}>{agentName}</span>
                   {model?.ticker && <span className="mono" style={{ color: "var(--dim)" }}>${model.ticker}</span>}
-                  <span className="badge"><span className="dot" style={{ background: "#7fd18f", color: "#04140e" }}>◗</span> RH</span>
+                  <RhBadge />
                 </div>
                 <div className="mono" style={{ marginTop: 4, fontSize: 12, color: "var(--dim)" }}>{shortAddr(address)} · by {shortAddr(data?.deployer ?? "")}</div>
               </div>
@@ -84,7 +85,7 @@ export default function AgentPage({ params }: { params: { address: string } }) {
           </div>
 
           {/* Price + funded */}
-          <div className="grid gap-4" style={{ gridTemplateColumns: "1fr 1fr" }}>
+          <div className="duo">
             <div className="card-2" style={{ padding: 18 }}>
               <div style={{ fontSize: 13, color: "var(--mut)" }}>Price</div>
               <div className="num" style={{ fontSize: 24, fontWeight: 700, marginTop: 6 }}>{curve ? `${curve.spotPrice.toPrecision(4)}` : "—"}<span style={{ fontSize: 13, color: "var(--dim)" }}> ETH</span></div>
