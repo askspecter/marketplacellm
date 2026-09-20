@@ -49,7 +49,7 @@ export function TradeWidget({ curve, token, tokenSymbol, quoteIsNative, quoteDec
   }, [amount, side, inputs, quoteIsNative, quoteDecimals, tokenSymbol, quoteSymbol]);
 
   if (state.graduated) {
-    return <div className="card" style={{ padding: 18, fontSize: 14, color: "var(--mut)" }}>This agent has <span className="up">graduated</span> to Uniswap V4 — trade it on the DEX pool.</div>;
+    return <div className="card" style={{ padding: 18, fontSize: 14, color: "var(--mut)" }}>This agent has <span className="up">graduated</span> to Uniswap V4 - trade it on the DEX pool.</div>;
   }
 
   async function submit() {
@@ -61,7 +61,7 @@ export function TradeWidget({ curve, token, tokenSymbol, quoteIsNative, quoteDec
         const quoteIn = quoteIsNative ? parseEther(amount) : parseUnits(amount, quoteDecimals);
         const minOut = withSlippage(quoteBuy(quoteIn, inputs).tokensOut, 300);
         await writeContractAsync({ address: curve, abi: v2CurveAbi as Abi, functionName: "buy", args: [quoteIn, minOut, address], value: quoteIsNative ? quoteIn : 0n });
-        setMsg({ kind: "ok", text: "Buy submitted — fees just funded this agent's compute." });
+        setMsg({ kind: "ok", text: "Buy submitted - fees just funded this agent's compute." });
       } else {
         const tokensIn = parseUnits(amount, 18);
         const minOut = withSlippage(quoteSell(tokensIn, inputs), 300);

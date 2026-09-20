@@ -29,7 +29,7 @@ export function ModelPicker({ value, onChange }: { value: PickerModel | null; on
         if (d.error) setError(d.error);
         setModels(d.models ?? []);
       })
-      .catch(() => alive && setError("Couldn't reach OpenRouter."));
+      .catch(() => alive && setError("Couldn't reach @orbiodotso."));
     return () => {
       alive = false;
     };

@@ -100,7 +100,7 @@ export function PriceChart({
   if (points.length < 2)
     return (
       <div style={{ height: 200, display: "grid", placeItems: "center", borderRadius: 14, background: "var(--bg-soft)", color: "var(--dim)", fontSize: 14, textAlign: "center", padding: "0 16px" }}>
-        No trades yet — the chart appears after the first buy.
+        No trades yet - the chart appears after the first buy.
       </div>
     );
 

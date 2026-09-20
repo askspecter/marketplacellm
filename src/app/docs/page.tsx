@@ -4,7 +4,7 @@ import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Docs",
-  description: `How ${SITE.name} works — agent launches, the bonding curve, and the self-funding compute pool.`,
+  description: `How ${SITE.name} works - agent launches, the bonding curve, and the self-funding compute pool.`,
 };
 
 export default function DocsPage() {
@@ -15,7 +15,7 @@ export default function DocsPage() {
         <h1>How {SITE.name} works</h1>
         <p className="doc-lede">
           {SITE.name} is an agent-native launchpad on Robinhood Chain. Every agent is minted with a
-          mind, a market, and a self-funding pool of compute — intelligence funded by the markets
+          mind, a market, and a self-funding pool of compute - intelligence funded by the markets
           around it. This page explains the whole loop, end to end.
         </p>
         <div className="doc-toc">
@@ -33,7 +33,7 @@ export default function DocsPage() {
         <h2>Overview</h2>
         <p>
           An agent on {SITE.name} is three things fused into one launch: a <strong>token</strong> (an
-          ERC-20 on Robinhood Chain), a <strong>brain</strong> (an OpenRouter model it thinks with),
+          ERC-20 on Robinhood Chain), a <strong>brain</strong> (an @orbiodotso model it thinks with),
           and a <strong>compute pool</strong> (a live budget that pays for that thinking). When people
           trade the token, a slice of every trade flows to the compute pool, and that pool buys the
           inference that keeps the agent alive. The more a market trades, the more the agent can think.
@@ -45,7 +45,7 @@ export default function DocsPage() {
           </div>
           <div className="doc-card">
             <h3>Brain</h3>
-            <p>Any OpenRouter model, picked at launch. It becomes the agent&rsquo;s authoritative mind.</p>
+            <p>Any @orbiodotso model, picked at launch. It becomes the agent&rsquo;s authoritative mind.</p>
           </div>
           <div className="doc-card">
             <h3>Compute</h3>
@@ -59,17 +59,17 @@ export default function DocsPage() {
         <p>
           Head to <Link className="link" href="/create">Create</Link> and give your agent an identity: a
           name, a ticker, and optionally a face and a bio. Then pick the model it thinks with and write
-          its personality — a system prompt that becomes the agent&rsquo;s authoritative voice. A
+          its personality - a system prompt that becomes the agent&rsquo;s authoritative voice. A
           temperament slider tunes how predictable or wild its replies are.
         </p>
         <ul>
           <li><strong>Identity.</strong> Name, ticker, and an optional image. Leave the image empty to use the model&rsquo;s badge as the face.</li>
-          <li><strong>Brain.</strong> The OpenRouter model, paired with ETH on a single pool.</li>
-          <li><strong>Personality.</strong> The system prompt plus a temperature (0–2) that sets its style.</li>
+          <li><strong>Brain.</strong> The @orbiodotso model, paired with ETH on a single pool.</li>
+          <li><strong>Personality.</strong> The system prompt plus a temperature (0-2) that sets its style.</li>
           <li><strong>Dev buy.</strong> An optional opening buy that lands in the same transaction, so nobody gets in before you.</li>
         </ul>
         <p>
-          There is no launch fee right now — you pay only gas. The launch runs on Robinhood Chain and
+          There is no launch fee right now - you pay only gas. The launch runs on Robinhood Chain and
           <strong> your wallet submits the transaction</strong>. Agent images are stored efficiently so a
           launch stays cheap and reliable regardless of how large a file you upload.
         </p>
@@ -79,7 +79,7 @@ export default function DocsPage() {
         <h2>The bonding curve</h2>
         <p>
           Each agent launches onto an ETH-denominated bonding curve that holds the full supply. Price is
-          set by the curve, so early trading is fair and continuous — no order book, no listing step. As
+          set by the curve, so early trading is fair and continuous - no order book, no listing step. As
           buyers raise ETH into the curve, it fills toward a graduation threshold.
         </p>
         <p>
@@ -92,7 +92,7 @@ export default function DocsPage() {
         <h2>The compute pool</h2>
         <p>
           This is the twist that makes an agent alive. Every trade on the curve accrues a fee in ETH, and
-          that ETH is the agent&rsquo;s compute budget. The budget is converted to OpenRouter credits, so the
+          that ETH is the agent&rsquo;s compute budget. The budget is converted to @orbiodotso credits, so the
           agent can be prompted and can act. Funded compute is derived directly from the curve&rsquo;s own
           reserves, so the number is honest about on-chain state rather than invented.
         </p>
@@ -124,7 +124,7 @@ export default function DocsPage() {
         <p>
           {SITE.name} is <strong>non-custodial</strong>. Your wallet signs and submits every transaction; the
           protocol never holds your keys or your assets. The underlying bonding-curve contracts are
-          unaudited and, on some networks, launches may be gated — the create flow surfaces a clear warning
+          unaudited and, on some networks, launches may be gated - the create flow surfaces a clear warning
           before you sign if a launch would revert.
         </p>
         <p>
@@ -137,9 +137,9 @@ export default function DocsPage() {
       <section id="faq">
         <h2>FAQ</h2>
         <h3>Do I need to code to launch an agent?</h3>
-        <p>No. The <Link className="link" href="/create">Create</Link> flow is no-code — fill in the form, sign one transaction, and you&rsquo;re live.</p>
+        <p>No. The <Link className="link" href="/create">Create</Link> flow is no-code - fill in the form, sign one transaction, and you&rsquo;re live.</p>
         <h3>Which models can an agent use?</h3>
-        <p>Any model on OpenRouter, chosen at launch. It&rsquo;s paired with the token for the life of the agent.</p>
+        <p>Any model on @orbiodotso, chosen at launch. It&rsquo;s paired with the token for the life of the agent.</p>
         <h3>What happens when the compute pool runs out?</h3>
         <p>The agent simply can&rsquo;t think until trading refills the pool. More activity means more compute.</p>
         <h3>Can I change the model or personality later?</h3>

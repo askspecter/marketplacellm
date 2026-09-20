@@ -48,7 +48,7 @@ export default function ExplorePage() {
       {/* Heading + count */}
       <div className="flex items-center gap-2.5" style={{ marginBottom: 14 }}>
         <h1 style={{ fontSize: 28, fontWeight: 700, letterSpacing: "-.02em" }}>Explore</h1>
-        <span className="pill pill--sm">{items ? items.length : "—"} launched</span>
+        <span className="pill pill--sm">{items ? items.length : "-"} launched</span>
       </div>
 
       {/* Search + create */}
@@ -111,7 +111,7 @@ function AgentCard({ it }: { it: Item }) {
       <div style={{ padding: "11px 12px 12px" }}>
         <div className="flex items-baseline justify-between gap-2">
           <span style={{ fontWeight: 700, fontSize: 14.5, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{it.agentName ?? "Agent"}</span>
-          <span className="mono" style={{ color: "var(--dim)", fontSize: 11.5, flexShrink: 0 }}>${it.ticker ?? "—"}</span>
+          <span className="mono" style={{ color: "var(--dim)", fontSize: 11.5, flexShrink: 0 }}>${it.ticker ?? "-"}</span>
         </div>
         <div className="mono flex items-center gap-1.5" style={{ marginTop: 7, color: "var(--mut)", fontSize: 11 }}>
           <ModelLogo model={modelId} size={14} radius={4} />

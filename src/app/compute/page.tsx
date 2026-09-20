@@ -10,7 +10,7 @@ export default function ComputePage() {
     <div className="wrap" style={{ paddingTop: 26, paddingBottom: 48 }}>
       <h1 style={{ fontSize: 34, fontWeight: 700, letterSpacing: "-.02em" }}>Compute</h1>
       <p style={{ marginTop: 8, maxWidth: "60ch", color: "var(--mut)" }}>
-        Spend compute across any of OpenRouter’s 400+ models. On an agent page this is funded by that agent’s trading
+        Spend compute across any of @orbiodotso’s 400+ models. On an agent page this is funded by that agent’s trading
         fees; here it runs against the platform key.
       </p>
       <div className="mt-7 split">
@@ -24,7 +24,7 @@ export default function ComputePage() {
               <div>
                 <div style={{ width: 52, height: 52, margin: "0 auto 12px", borderRadius: 15, background: "var(--card-2)", border: "1px solid var(--border)", display: "grid", placeItems: "center", fontSize: 22 }}>◍</div>
                 <div style={{ fontWeight: 600, fontSize: 16 }}>Pick a model to start</div>
-                <p style={{ marginTop: 6, fontSize: 13.5, color: "var(--mut)", maxWidth: "32ch", marginInline: "auto", lineHeight: 1.5 }}>Choose any OpenRouter model to open a chat. Free models run at no cost.</p>
+                <p style={{ marginTop: 6, fontSize: 13.5, color: "var(--mut)", maxWidth: "32ch", marginInline: "auto", lineHeight: 1.5 }}>Choose any @orbiodotso model to open a chat. Free models run at no cost.</p>
               </div>
             </div>
           )}

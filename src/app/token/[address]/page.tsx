@@ -65,7 +65,7 @@ export default function AgentPage({ params }: { params: { address: string } }) {
   const decimals = data?.decimals ?? 18;
   const supplyTokens = data?.totalSupply ? Number(data.totalSupply) / 10 ** decimals : 1_000_000_000;
   const marketCapUsd = priceUsd != null ? priceUsd * supplyTokens : null;
-  const marketLabel = data ? (data.phase === 0 ? "Bonding curve" : "Uniswap V4") : "—";
+  const marketLabel = data ? (data.phase === 0 ? "Bonding curve" : "Uniswap V4") : "-";
 
   // Is the connected wallet this token's creator? Fees accrue to the creator
   // fee recipient (falls back to the deployer), so only they see the claim card.
@@ -116,9 +116,9 @@ export default function AgentPage({ params }: { params: { address: string } }) {
           {/* Market stats (pons-style grid) */}
           <div className="card" style={{ overflow: "hidden" }}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
-              <MarketCell label="Price" value={priceUsd != null ? usdPrice(priceUsd) : "—"} />
-              <MarketCell label="Market cap" value={marketCapUsd != null ? usdFull(marketCapUsd) : "—"} style={{ borderLeft: "1px solid var(--border)" }} />
-              <MarketCell label="Price in ETH" value={priceEth > 0 ? `${smallNum(priceEth)} ETH` : "—"} style={{ borderTop: "1px solid var(--border)" }} />
+              <MarketCell label="Price" value={priceUsd != null ? usdPrice(priceUsd) : "-"} />
+              <MarketCell label="Market cap" value={marketCapUsd != null ? usdFull(marketCapUsd) : "-"} style={{ borderLeft: "1px solid var(--border)" }} />
+              <MarketCell label="Price in ETH" value={priceEth > 0 ? `${smallNum(priceEth)} ETH` : "-"} style={{ borderTop: "1px solid var(--border)" }} />
               <MarketCell label="Market" value={marketLabel} style={{ borderTop: "1px solid var(--border)", borderLeft: "1px solid var(--border)" }} />
             </div>
           </div>
@@ -166,12 +166,12 @@ export default function AgentPage({ params }: { params: { address: string } }) {
             <Detail k="Bonding curve" v={shortAddr(data?.curveAddress ?? "")} />
             <Detail k="Creator" v={shortAddr(data?.deployer ?? "")} />
             <Detail k="Paired asset" v="ETH (native)" />
-            <Detail k="Brain" v={`${p.name} · ${model?.modelName ?? "—"}`} />
-            <Detail k="Phase" v={data?.phaseLabel ?? "—"} />
+            <Detail k="Brain" v={`${p.name} · ${model?.modelName ?? "-"}`} />
+            <Detail k="Phase" v={data?.phaseLabel ?? "-"} />
             <Detail k="Compute funded" v={usd(pool?.creditedUsd ?? 0)} />
           </div>
 
-          <p className="notice">Live on Robinhood Chain — you sign every transaction and Neuma never custodies your assets. Tokens can be volatile and may lose all value; prices and compute figures are estimates. Nothing here is financial advice.</p>
+          <p className="notice">Live on Robinhood Chain - you sign every transaction and Neuma never custodies your assets. Tokens can be volatile and may lose all value; prices and compute figures are estimates. Nothing here is financial advice.</p>
         </div>
 
         {/* Right */}

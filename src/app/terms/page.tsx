@@ -15,7 +15,7 @@ export default function TermsPage() {
         <h1>Terms of Use</h1>
         <p className="doc-lede">
           These terms govern your use of the {SITE.name} interface. {SITE.name} is non-custodial software for
-          interacting with public smart contracts — please read this carefully before you launch or trade.
+          interacting with public smart contracts - please read this carefully before you launch or trade.
         </p>
         <p className="doc-updated" style={{ marginTop: 16 }}>Last updated 20 September 2026</p>
       </div>
@@ -52,7 +52,7 @@ export default function TermsPage() {
         <h2>4. No financial advice</h2>
         <p>
           Nothing on {SITE.name} is financial, investment, legal, or tax advice. Information and figures shown in
-          the interface — including prices, market caps, and &ldquo;funded compute&rdquo; — are estimates and can be
+          the interface - including prices, market caps, and &ldquo;funded compute&rdquo; - are estimates and can be
           inaccurate or out of date. You are solely responsible for your own decisions.
         </p>
       </section>
@@ -64,7 +64,7 @@ export default function TermsPage() {
           <li><strong>Unaudited contracts.</strong> The underlying bonding-curve contracts are unaudited and may contain bugs or behave unexpectedly.</li>
           <li><strong>Irreversibility.</strong> On-chain transactions are permanent. A transaction you sign cannot be undone, and mistakes are your responsibility.</li>
           <li><strong>No guarantees.</strong> Agents are experimental software; their outputs and behavior are not guaranteed and should not be relied upon.</li>
-          <li><strong>Gas &amp; failed transactions.</strong> Network fees apply, and a transaction can revert (for example, if a launch is gated) — spending gas without completing.</li>
+          <li><strong>Gas &amp; failed transactions.</strong> Network fees apply, and a transaction can revert (for example, if a launch is gated) - spending gas without completing.</li>
           <li><strong>Third-party dependencies.</strong> The Service relies on wallets, RPC providers, inference providers, and networks we do not control.</li>
         </ul>
       </section>
@@ -119,7 +119,7 @@ export default function TermsPage() {
         <p>
           To the fullest extent permitted by law, {SITE.name} Labs and its contributors will not be liable for
           any indirect, incidental, special, consequential, or exemplary damages, or for any loss of
-          profits, tokens, or data, arising from your use of the Service — including losses from volatility,
+          profits, tokens, or data, arising from your use of the Service - including losses from volatility,
           contract bugs, failed transactions, or third-party services.
         </p>
       </section>

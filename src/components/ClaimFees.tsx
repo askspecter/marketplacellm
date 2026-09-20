@@ -64,7 +64,7 @@ export function ClaimFees() {
         <div>
           <div style={{ fontSize: 13, color: "var(--mut)" }}>Creator fees</div>
           <div className="num" style={{ marginTop: 4, fontSize: 26, fontWeight: 700 }}>{eth.toLocaleString("en-US", { maximumFractionDigits: 6 })} ETH</div>
-          <div style={{ marginTop: 4, fontSize: 12.5, color: "var(--dim)" }}>Claimable from the Pons v2 fee escrow — the compute budget your agents earned.</div>
+          <div style={{ marginTop: 4, fontSize: 12.5, color: "var(--dim)" }}>Claimable from the Pons v2 fee escrow - the compute budget your agents earned.</div>
         </div>
         <button onClick={claim} disabled={busy || wei === 0n} className="btn btn-cream">{busy ? "Claiming…" : "Claim fees"}</button>
       </div>

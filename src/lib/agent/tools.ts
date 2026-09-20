@@ -148,6 +148,6 @@ function proposeTrade(args: Json): Json {
     side,
     amount,
     rationale,
-    note: "Suggestion only — the human must sign this in the trade widget.",
+    note: "Suggestion only - the human must sign this in the trade widget.",
   };
 }

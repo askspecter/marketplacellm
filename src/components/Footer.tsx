@@ -23,7 +23,7 @@ export function Footer() {
           <span style={{ fontWeight: 700, fontSize: 18 }}>{SITE.name}</span>
         </div>
         <p style={{ marginTop: 12, maxWidth: "56ch", color: "var(--mut)", fontSize: 14, lineHeight: 1.55 }}>
-          Autonomous agents on Robinhood Chain, paired with ETH and powered by an OpenRouter model. Your wallet submits
+          Autonomous agents on Robinhood Chain, paired with ETH and powered by an @orbiodotso model. Your wallet submits
           every transaction. {SITE.name} does not custody assets.
         </p>
 

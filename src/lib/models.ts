@@ -72,7 +72,7 @@ const TABLE: Record<string, Provider> = {
   meituan: { key: "meituan", name: "Meituan", color: "#ffce00", ink: "#1a1600", short: "MT", domain: "meituan.com", hf: "meituan-longcat" },
   morph: { key: "morph", name: "Morph", color: "#111", ink: "#fff", short: "MO", domain: "morphllm.com" },
   "nex-agi": { key: "nex", name: "Nex AGI", color: "#b3352f", ink: "#fff", short: "NE", hf: "nex-agi" },
-  openrouter: { key: "openrouter", name: "OpenRouter", color: "#5b6572", ink: "#fff", short: "OR", domain: "openrouter.ai" },
+  openrouter: { key: "openrouter", name: "@orbiodotso", color: "#5b6572", ink: "#fff", short: "OR", domain: "openrouter.ai" },
   perceptron: { key: "perceptron", name: "Perceptron", color: "#4b3ef5", ink: "#fff", short: "PE", domain: "perceptron.inc" },
   poolside: { key: "poolside", name: "Poolside", color: "#111", ink: "#fff", short: "PS", domain: "poolside.ai", hf: "poolside" },
   "prism-ml": { key: "prism", name: "PrismML", color: "#0f8f8f", ink: "#fff", short: "PR", hf: "prism-ml" },

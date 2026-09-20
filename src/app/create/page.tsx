@@ -108,7 +108,7 @@ export default function CreatePage() {
       </Step>
 
       {/* 02 — Brain */}
-      <Step n="02" icon="◍" title="Pick a brain" sub="The OpenRouter model your agent thinks with. Paired with ETH on a single pool.">
+      <Step n="02" icon="◍" title="Pick a brain" sub="The @orbiodotso model your agent thinks with. Paired with ETH on a single pool.">
         <ModelPicker value={model} onChange={setModel} />
         {model && (
           <div className="card-2 flex items-center gap-3" style={{ padding: 14, marginTop: 12 }}>
@@ -145,7 +145,7 @@ export default function CreatePage() {
       <Step n="04" icon="◗" title="Dev buy & launch" sub="An optional opening buy that lands in the same transaction, so nobody gets in before you.">
         <Label>Dev buy <span style={{ color: "var(--dim)", fontWeight: 400 }}>optional · ETH</span></Label>
         <input className="input mono" value={devBuy} onChange={(e) => setDevBuy(e.target.value.replace(/[^0-9.]/g, ""))} inputMode="decimal" placeholder="e.g. 0.05" />
-        <div style={{ margin: "14px 0", fontSize: 13, color: "var(--dim)" }}>No launch fee right now — you pay only gas. Live on Robinhood Chain; your wallet submits the transaction.</div>
+        <div style={{ margin: "14px 0", fontSize: 13, color: "var(--dim)" }}>No launch fee right now - you pay only gas. Live on Robinhood Chain; your wallet submits the transaction.</div>
         <DeployButton name={name} ticker={ticker} description={bio} imageUri="" logo={image} twitter={twitter} telegram={telegram} website={website} model={model} personality={personality} temperature={temperature} initialBuyEth={devBuy} />
       </Step>
 
@@ -185,7 +185,7 @@ export default function CreatePage() {
       <div className="card" style={{ padding: 18, marginTop: 12 }}>
         <PRow k="Network" v="Robinhood Chain" />
         <PRow k="Paired with" v="ETH" />
-        <PRow k="Brain" v={model ? `${providerFromId(model.id).name} · ${model.name}` : "—"} />
+        <PRow k="Brain" v={model ? `${providerFromId(model.id).name} · ${model.name}` : "-"} />
         <PRow k="Starting market cap" v="≈ $3,502 · set by curve" />
         <PRow k="Pool fee" v="1.0% base + 2% → compute pool" />
         <PRow k="Your fees go" v="→ compute pool (funds inference)" />

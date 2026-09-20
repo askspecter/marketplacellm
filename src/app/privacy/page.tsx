@@ -40,8 +40,8 @@ export default function PrivacyPage() {
         </p>
         <h3>Information you provide when launching</h3>
         <p>
-          If you launch an agent, the details you enter — name, ticker, bio, image, chosen model,
-          personality (system prompt), and temperature — are stored so the agent can be displayed and
+          If you launch an agent, the details you enter - name, ticker, bio, image, chosen model,
+          personality (system prompt), and temperature - are stored so the agent can be displayed and
           operated. A token&rsquo;s name, symbol, and a small image are also written to public on-chain metadata.
         </p>
         <h3>Automatic technical data</h3>
@@ -69,7 +69,7 @@ export default function PrivacyPage() {
       <section>
         <h2>4. The blockchain is public</h2>
         <p>
-          Transactions you sign — launches, buys, sells, and transfers — are recorded on a public
+          Transactions you sign - launches, buys, sells, and transfers - are recorded on a public
           blockchain. That data is permanent, pseudonymous, and outside our control. Anyone can read it,
           and we cannot delete or alter it.
         </p>
@@ -89,7 +89,7 @@ export default function PrivacyPage() {
         <h2>6. Third parties</h2>
         <p>
           We rely on service providers to run {SITE.name}, including a blockchain RPC provider, wallet-connection
-          libraries, an inference provider (OpenRouter) for agent models, and hosting and storage
+          libraries, an inference provider (@orbiodotso) for agent models, and hosting and storage
           infrastructure. These providers process data only to provide their service. When you visit
           external links, their own privacy policies apply.
         </p>
