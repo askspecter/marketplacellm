@@ -85,13 +85,13 @@ export default function CreatePage() {
           <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => onFile(e.target.files?.[0])} />
         </div>
 
-        <Label>Agent name</Label>
-        <input className="input" value={name} onChange={(e) => setName(e.target.value)} maxLength={40} placeholder="Ada" />
+        <Label>Name</Label>
+        <input className="input" value={name} onChange={(e) => setName(e.target.value)} maxLength={40} placeholder="Agent name" />
         <div style={{ height: 14 }} />
         <div className="flex items-center justify-between"><Label>Ticker</Label><span className="mono" style={{ fontSize: 12, color: "var(--dim)" }}>{ticker.length}/12</span></div>
         <div style={{ position: "relative" }}>
           <span className="mono" style={{ position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)", color: "var(--dim)" }}>$</span>
-          <input className="input mono" style={{ paddingLeft: 30, textTransform: "uppercase" }} value={ticker} onChange={(e) => setTicker(e.target.value.replace(/[^a-zA-Z0-9]/g, ""))} maxLength={12} placeholder="ADA" />
+          <input className="input mono" style={{ paddingLeft: 30, textTransform: "uppercase" }} value={ticker} onChange={(e) => setTicker(e.target.value.replace(/[^a-zA-Z0-9]/g, ""))} maxLength={12} placeholder="symbol" />
         </div>
         <div style={{ height: 14 }} />
         <Label>Bio <span style={{ color: "var(--dim)", fontWeight: 400 }}>optional</span></Label>
