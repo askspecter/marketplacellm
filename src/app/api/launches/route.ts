@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { Address } from "viem";
-import { indexV2Launches, readTokenInfoV2 } from "@/lib/pons/readerV2";
+import { readTokenInfoV2 } from "@/lib/pons/readerV2";
 import { listLinks } from "@/lib/pool";
 
 export const runtime = "nodejs";
@@ -8,21 +8,18 @@ export const dynamic = "force-dynamic";
 
 /**
  * GET /api/launches
- * The feed: recent Pons v2 launches (indexed on-chain via the engine), each
- * annotated with the OpenRouter model it funds (from the compute-pool store).
- * Chain-indexed launches and locally-registered links are merged so the feed
- * still shows this deployment's launches even if the RPC is slow.
+ * The feed: agents launched THROUGH Neuma. The source of truth is the pool
+ * store (every launch registers a token->model link via /api/pool), so the feed
+ * only ever shows this platform's own agents, never arbitrary tokens that happen
+ * to exist on the shared Pons v2 factory. Ordering is newest-first (listLinks).
+ *
+ * Durability note: launches persist only when a KV store is configured (see
+ * lib/kv.ts). Without one the link store is in-memory and resets per serverless
+ * instance, so agents can vanish on refresh. Connect a Vercel KV / Upstash
+ * database to the project to keep the feed permanent.
  */
 export async function GET() {
   const links = await listLinks().catch(() => []);
-  const byToken = new Map(links.map((l) => [l.token.toLowerCase(), l]));
-
-  let onchain: Awaited<ReturnType<typeof indexV2Launches>> = [];
-  try {
-    onchain = await indexV2Launches({ limit: 18 });
-  } catch {
-    onchain = [];
-  }
 
   interface FeedItem {
     token: string;
@@ -37,53 +34,29 @@ export async function GET() {
     ticker: string | null;
     bio: string | null;
     logo: string | null;
+    createdAt: number;
   }
 
-  const seen = new Set<string>();
-  const feed: FeedItem[] = onchain.map((l): FeedItem => {
-    const key = l.token.toLowerCase();
-    seen.add(key);
-    const link = byToken.get(key);
-    return {
-      token: l.token,
-      curve: l.curve,
-      deployer: l.deployer,
-      pairToken: l.pairToken,
-      blockNumber: l.blockNumber.toString(),
-      txHash: l.txHash,
-      model: link?.model ?? null,
-      modelName: link?.modelName ?? null,
-      agentName: link?.agentName ?? null,
-      ticker: link?.ticker ?? null,
-      bio: link?.bio ?? null,
-      logo: link?.logo ?? null,
-    };
-  });
+  const feed: FeedItem[] = links.map((l) => ({
+    token: l.token,
+    curve: l.curve ?? "0x",
+    deployer: l.creator ?? "0x",
+    pairToken: "0x0000000000000000000000000000000000000000",
+    blockNumber: "0",
+    txHash: l.txHash ?? "0x",
+    model: l.model,
+    modelName: l.modelName,
+    agentName: l.agentName ?? null,
+    ticker: l.ticker ?? null,
+    bio: l.bio ?? null,
+    logo: l.logo ?? null,
+    createdAt: l.createdAt ?? 0,
+  }));
 
-  // Include locally-registered launches the indexer hasn't surfaced yet.
-  for (const l of links) {
-    if (seen.has(l.token.toLowerCase())) continue;
-    feed.unshift({
-      token: l.token,
-      curve: l.curve ?? "0x",
-      deployer: l.creator ?? "0x",
-      pairToken: "0x0000000000000000000000000000000000000000",
-      blockNumber: "0",
-      txHash: l.txHash ?? "0x",
-      model: l.model,
-      modelName: l.modelName,
-      agentName: l.agentName ?? null,
-      ticker: l.ticker ?? null,
-      bio: l.bio ?? null,
-      logo: l.logo ?? null,
-    });
-  }
-
-  // Enrich items that have no local agent name with the token's on-chain
-  // name / symbol / logo, so foreign launches render with a real identity.
+  // Fill in any missing name / symbol / image from on-chain metadata so an agent
+  // launched with a sparse profile still renders a real identity.
   await Promise.allSettled(
     feed.map(async (it) => {
-      // Skip only when we already have both a name and an image.
       if (it.agentName && it.logo) return;
       try {
         const info = await readTokenInfoV2(it.token as Address);
