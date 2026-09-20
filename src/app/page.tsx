@@ -44,25 +44,24 @@ export default function ExplorePage() {
   }, [items, q, tab]);
 
   return (
-    <div className="wrap" style={{ paddingTop: 22, paddingBottom: 40 }}>
-      {/* Search + create */}
-      <div className="flex gap-3" style={{ marginBottom: 26 }}>
-        <input className="input" placeholder="Search agents by name, ticker or model…" value={q} onChange={(e) => setQ(e.target.value)} />
-        <Link href="/create" className="btn btn-cream" style={{ whiteSpace: "nowrap" }}>+ Launch</Link>
-      </div>
-
+    <div className="wrap" style={{ paddingTop: 14, paddingBottom: 40 }}>
       {/* Heading + count */}
-      <div className="flex items-center gap-3" style={{ marginBottom: 18 }}>
-        <h1 style={{ fontSize: 34, fontWeight: 700, letterSpacing: "-.02em" }}>Explore</h1>
+      <div className="flex items-center gap-2.5" style={{ marginBottom: 14 }}>
+        <h1 style={{ fontSize: 28, fontWeight: 700, letterSpacing: "-.02em" }}>Explore</h1>
         <span className="pill pill--sm">{items ? items.length : "—"} launched</span>
       </div>
 
+      {/* Search + create */}
+      <div className="flex gap-2.5" style={{ marginBottom: 14 }}>
+        <input className="input" placeholder="Search name, ticker or model…" value={q} onChange={(e) => setQ(e.target.value)} />
+        <Link href="/create" className="btn btn-cream" style={{ whiteSpace: "nowrap" }}>+ Launch</Link>
+      </div>
+
       {/* Tabs + chain filter */}
-      <div className="flex flex-wrap items-center gap-2" style={{ marginBottom: 22 }}>
+      <div className="flex flex-wrap items-center gap-2" style={{ marginBottom: 16 }}>
         <button className={`pill ${tab === "trending" ? "pill--active" : ""}`} onClick={() => setTab("trending")}>Trending</button>
         <button className={`pill ${tab === "new" ? "pill--active" : ""}`} onClick={() => setTab("new")}>New</button>
-        <span style={{ width: 12 }} />
-        <RhBadge label="Robinhood" />
+        <span className="ml-auto"><RhBadge label="Robinhood" /></span>
       </div>
 
       {/* Grid */}
