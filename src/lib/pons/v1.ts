@@ -2,7 +2,7 @@ import { parseEther, toHex, type Address } from "viem";
 import { v1LaunchAbi } from "./abis";
 import { PONS_V1, REGISTRY } from "./registry";
 import type { LaunchStrategy } from "./strategy";
-import { V1_QUOTE_ASSETS, type LaunchInput, type LaunchPlan, type VersionInfo } from "./types";
+import { V1_QUOTE_ASSETS, onchainLogo, type LaunchInput, type LaunchPlan, type VersionInfo } from "./types";
 
 /**
  * Pons v1 - one transaction deploys the token AND a Uniswap V3 pool that is
@@ -35,7 +35,9 @@ export class PonsV1Adapter implements LaunchStrategy {
     const params = {
       name: input.name,
       symbol: input.ticker,
-      logo: input.imageUri,
+      // Never write a data URI on-chain (factory caps logo length). The full
+      // image is stored off-chain in the agent profile.
+      logo: onchainLogo(input.imageUri),
       description: input.description,
       socials: {
         twitter: input.twitter?.trim() ?? "",

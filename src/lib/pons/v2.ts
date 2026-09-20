@@ -3,7 +3,7 @@ import { v2FactoryAbi, v2LaunchAndBuyAbi } from "./abisV2";
 import { PONS_V2, REGISTRY, V2_GRADUATION_THRESHOLD_ETH } from "./registry";
 import { canLaunch, launchFee, previewLaunchEconomics } from "./readerV2";
 import type { LaunchStrategy } from "./strategy";
-import { V2_QUOTE_ASSETS, type LaunchInput, type LaunchPlan, type VersionInfo } from "./types";
+import { V2_QUOTE_ASSETS, onchainLogo, type LaunchInput, type LaunchPlan, type VersionInfo } from "./types";
 
 /**
  * Pons v2 - the token starts on an ETH-denominated bonding curve holding the
@@ -64,7 +64,9 @@ export class PonsV2Adapter implements LaunchStrategy {
     const params = {
       name: input.name,
       symbol: input.ticker,
-      logo: input.imageUri,
+      // Never write a data URI on-chain — the factory caps logo at 512 chars
+      // and reverts otherwise. The full image is stored off-chain.
+      logo: onchainLogo(input.imageUri),
       description: input.description,
       socials: {
         twitter: input.twitter?.trim() ?? "",

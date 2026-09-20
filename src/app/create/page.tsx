@@ -22,53 +22,35 @@ export default function CreatePage() {
   const [personality, setPersonality] = useState("");
   const [temperature, setTemperature] = useState(0.7);
   const [model, setModel] = useState<PickerModel | null>(null);
-  const [image, setImage] = useState<string>("");        // full image → stored off-chain, shown everywhere
-  const [chainLogo, setChainLogo] = useState<string>(""); // tiny thumbnail → written on-chain (kept small)
+  const [image, setImage] = useState<string>(""); // agent image — stored off-chain, shown across the UI
   const [devBuy, setDevBuy] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
-  // A launch writes the token's logo into on-chain metadata. A full data-URI
-  // (tens of KB) bloats the launch calldata and can make the transaction
-  // revert or cost far too much gas — the classic "logo too long" failure.
-  // So we keep TWO renditions: a crisp one stored off-chain (shown in the UI),
-  // and a tiny thumbnail, byte-capped, that is safe to embed on-chain.
-  const ONCHAIN_LOGO_MAX = 4500; // chars of the data URI (~3.3KB) — safe calldata
-
-  function render(img: HTMLImageElement, max: number, quality: number): string {
-    const scale = Math.min(1, max / Math.max(img.width, img.height));
-    const w = Math.max(1, Math.round(img.width * scale));
-    const h = Math.max(1, Math.round(img.height * scale));
-    const canvas = document.createElement("canvas");
-    canvas.width = w; canvas.height = h;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return "";
-    ctx.drawImage(img, 0, 0, w, h);
-    try { return canvas.toDataURL("image/webp", quality); }
-    catch { return canvas.toDataURL("image/jpeg", quality); }
-  }
-
-  // Accept ANY image size: downscale to a small square on-canvas.
+  // IMPORTANT: the launch contract caps on-chain metadata strings at 512 chars
+  // and rejects data: URIs, so the image is NEVER written on-chain — a data URI
+  // is always far larger and the launch would revert ("logo too long"). We
+  // downscale the upload for display and store it OFF-CHAIN in the agent's
+  // profile (see DeployButton → /api/pool); the on-chain logo is left empty and
+  // the feed / token page read the off-chain image.
   function onFile(f?: File | null) {
     if (!f || !f.type.startsWith("image/")) return;
     const r = new FileReader();
     r.onload = () => {
       const img = new Image();
       img.onload = () => {
-        // Display / off-chain rendition.
-        const full = render(img, 384, 0.85);
-        setImage(full || String(r.result));
-
-        // On-chain thumbnail: shrink until it fits the byte cap. If even the
-        // smallest rendition is too big, launch with no on-chain logo (the
-        // full image still shows from the off-chain store) so the tx succeeds.
-        let thumb = "";
-        for (const [px, q] of [[128, 0.72], [96, 0.66], [72, 0.6], [56, 0.5], [40, 0.45]] as const) {
-          const t = render(img, px, q);
-          if (t && t.length <= ONCHAIN_LOGO_MAX) { thumb = t; break; }
-        }
-        setChainLogo(thumb);
+        const MAX = 384;
+        const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+        const w = Math.max(1, Math.round(img.width * scale));
+        const h = Math.max(1, Math.round(img.height * scale));
+        const canvas = document.createElement("canvas");
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) { setImage(String(r.result)); return; }
+        ctx.drawImage(img, 0, 0, w, h);
+        try { setImage(canvas.toDataURL("image/webp", 0.85)); }
+        catch { setImage(canvas.toDataURL("image/jpeg", 0.85)); }
       };
-      img.onerror = () => { setImage(String(r.result)); setChainLogo(""); };
+      img.onerror = () => setImage(String(r.result));
       img.src = String(r.result);
     };
     r.readAsDataURL(f);
@@ -164,7 +146,7 @@ export default function CreatePage() {
         <Label>Dev buy <span style={{ color: "var(--dim)", fontWeight: 400 }}>optional · ETH</span></Label>
         <input className="input mono" value={devBuy} onChange={(e) => setDevBuy(e.target.value.replace(/[^0-9.]/g, ""))} inputMode="decimal" placeholder="e.g. 0.05" />
         <div style={{ margin: "14px 0", fontSize: 13, color: "var(--dim)" }}>No launch fee right now — you pay only gas. Live on Robinhood Chain; your wallet submits the transaction.</div>
-        <DeployButton name={name} ticker={ticker} description={bio} imageUri={chainLogo} logo={image} twitter={twitter} telegram={telegram} website={website} model={model} personality={personality} temperature={temperature} initialBuyEth={devBuy} />
+        <DeployButton name={name} ticker={ticker} description={bio} imageUri="" logo={image} twitter={twitter} telegram={telegram} website={website} model={model} personality={personality} temperature={temperature} initialBuyEth={devBuy} />
       </Step>
 
       {/* Live preview */}

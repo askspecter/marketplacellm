@@ -2,6 +2,19 @@
 export type PonsVersion = "v1" | "v2";
 
 /**
+ * The Pons factory caps every on-chain metadata string at 512 characters and
+ * reverts (0x85b8e2f4) on anything longer — and a data: URI image is always far
+ * larger. So an image is never written on-chain: it lives in the off-chain
+ * agent profile instead. This returns a value safe to embed on-chain: a short
+ * hosted URL (http/ipfs/ar) that fits the limit, otherwise an empty string.
+ */
+export function onchainLogo(logo?: string): string {
+  const s = (logo ?? "").trim();
+  if (!s || s.length > 512 || s.startsWith("data:")) return "";
+  return s;
+}
+
+/**
  * Quote assets.
  *  - v1 supports WETH only.
  *  - v2 adds RWA pairs (USDG, NVDA, AAPL, HOOD).
