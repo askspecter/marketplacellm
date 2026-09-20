@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ModelLogo } from "@/components/ModelLogo";
 import { RhBadge } from "@/components/RhBadge";
+import { HomeHero } from "@/components/HomeHero";
 import { providerFromId, modelTail, fallbackModel } from "@/lib/models";
 import { shortAddr } from "@/lib/format";
 
@@ -44,7 +45,9 @@ export default function ExplorePage() {
   }, [items, q, tab]);
 
   return (
-    <div className="wrap" style={{ paddingTop: 14, paddingBottom: 40 }}>
+    <>
+      <HomeHero />
+      <div className="wrap" style={{ paddingTop: 26, paddingBottom: 40 }}>
       {/* Heading + count */}
       <div className="flex items-center gap-2.5" style={{ marginBottom: 14 }}>
         <h1 style={{ fontSize: 28, fontWeight: 700, letterSpacing: "-.02em" }}>Explore</h1>
@@ -74,7 +77,8 @@ export default function ExplorePage() {
       ) : (
         <Grid>{list.map((it) => <AgentCard key={it.token} it={it} />)}</Grid>
       )}
-    </div>
+      </div>
+    </>
   );
 }
 

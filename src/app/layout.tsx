@@ -3,6 +3,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { BottomNav } from "@/components/BottomNav";
 import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -36,11 +37,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <Providers>
-          <div className="flex min-h-dvh flex-col overflow-x-hidden">
+          <div className="app-shell flex min-h-dvh flex-col overflow-x-hidden">
             <Header />
             <main className="flex-1">{children}</main>
             <Footer />
           </div>
+          <BottomNav />
         </Providers>
       </body>
     </html>
