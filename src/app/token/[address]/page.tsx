@@ -6,90 +6,41 @@ import { isAddress } from "viem";
 import { TradeWidget, type CurveInputsSerialized } from "@/components/TradeWidget";
 import { PriceChart } from "@/components/PriceChart";
 import { AgentConsole } from "@/components/AgentConsole";
+import { ModelLogo } from "@/components/ModelLogo";
+import { providerFromId } from "@/lib/models";
 import { shortAddr, usd } from "@/lib/format";
 
 interface TokenData {
-  token: string;
-  name: string;
-  symbol: string;
-  decimals: number;
-  logo: string;
-  description: string;
-  deployer: string;
-  curveAddress: string;
-  pairToken: string;
-  phase: number;
-  phaseLabel: string;
-  curve: {
-    quoteReserve: string;
-    tokenReserve: string;
-    realQuoteReserve: string;
-    graduationThreshold: string;
-    sellableTokens: string;
-    graduated: boolean;
-    progress: number;
-    spotPrice: number;
-    feeBps: string;
-    creatorTaxBps: string;
-  } | null;
+  token: string; name: string; symbol: string; decimals: number; logo: string; description: string;
+  deployer: string; curveAddress: string; pairToken: string; phase: number; phaseLabel: string;
+  curve: { quoteReserve: string; tokenReserve: string; realQuoteReserve: string; graduationThreshold: string; sellableTokens: string; graduated: boolean; progress: number; spotPrice: number; feeBps: string; creatorTaxBps: string; } | null;
   error?: string;
 }
-
 interface PoolData {
-  link: {
-    model: string;
-    modelName: string;
-    promptPerM: number;
-    completionPerM: number;
-    agentName?: string;
-    ticker?: string;
-    bio?: string;
-    personality?: string;
-    temperature?: number;
-  } | null;
-  spendUsd: number;
-  creditedUsd: number;
-  remainingUsd: number;
+  link: { model: string; modelName: string; agentName?: string; ticker?: string; bio?: string; personality?: string; temperature?: number } | null;
+  spendUsd: number; creditedUsd: number; remainingUsd: number;
 }
 
-export default function TokenPage({ params }: { params: { address: string } }) {
+export default function AgentPage({ params }: { params: { address: string } }) {
   const address = params.address;
   const [data, setData] = useState<TokenData | null>(null);
   const [pool, setPool] = useState<PoolData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isAddress(address)) {
-      setLoading(false);
-      return;
-    }
+    if (!isAddress(address)) { setLoading(false); return; }
     let alive = true;
-    const load = () =>
-      Promise.all([
-        fetch(`/api/v2/token?address=${address}`).then((r) => r.json()),
-        fetch(`/api/pool?token=${address}`).then((r) => r.json()),
-      ])
-        .then(([t, p]) => {
-          if (!alive) return;
-          setData(t);
-          setPool(p);
-        })
-        .catch(() => {})
-        .finally(() => alive && setLoading(false));
-
+    const load = () => Promise.all([
+      fetch(`/api/v2/token?address=${address}`).then((r) => r.json()),
+      fetch(`/api/pool?token=${address}`).then((r) => r.json()),
+    ]).then(([t, p]) => { if (!alive) return; setData(t); setPool(p); }).catch(() => {}).finally(() => alive && setLoading(false));
     load();
-    // Live: refresh curve state + pool every 12s (pauses in a hidden tab).
-    const id = setInterval(() => {
-      if (!document.hidden) load();
-    }, 12_000);
-    return () => {
-      alive = false;
-      clearInterval(id);
-    };
+    const id = setInterval(() => { if (!document.hidden) load(); }, 12_000);
+    return () => { alive = false; clearInterval(id); };
   }, [address]);
 
-  if (!isAddress(address)) return <Shell>Invalid token address.</Shell>;
-  if (loading) return <Shell>Loading token…</Shell>;
+  if (!isAddress(address)) return <Shell>Invalid address.</Shell>;
+  if (loading) return <Shell>Loading agent…</Shell>;
 
   const model = pool?.link ?? null;
   const agentName = model?.agentName || data?.name || "Agent";
@@ -97,145 +48,86 @@ export default function TokenPage({ params }: { params: { address: string } }) {
   const curve = data?.curve ?? null;
   const isNative = !data?.pairToken || data.pairToken === "0x0000000000000000000000000000000000000000";
   const progressPct = curve ? Math.min(100, Math.round(curve.progress * 100)) : 0;
+  const p = providerFromId(model?.model);
 
-  const serialized: CurveInputsSerialized | null = curve
-    ? {
-        quoteReserve: curve.quoteReserve,
-        tokenReserve: curve.tokenReserve,
-        sellableTokens: curve.sellableTokens,
-        feeBps: curve.feeBps,
-        creatorTaxBps: curve.creatorTaxBps,
-        graduated: curve.graduated,
-      }
-    : null;
+  const serialized: CurveInputsSerialized | null = curve ? {
+    quoteReserve: curve.quoteReserve, tokenReserve: curve.tokenReserve, sellableTokens: curve.sellableTokens,
+    feeBps: curve.feeBps, creatorTaxBps: curve.creatorTaxBps, graduated: curve.graduated,
+  } : null;
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
-      <Link href="/#feed" className="text-sm text-white/40 hover:text-white">
-        ← All agents
-      </Link>
+    <div className="wrap" style={{ paddingTop: 18, paddingBottom: 44 }}>
+      <Link href="/" style={{ color: "var(--dim)", fontSize: 14 }}>← Explore</Link>
 
-      <div className="mt-4 grid gap-6 lg:grid-cols-[1.3fr_1fr]">
-        {/* Left column */}
-        <div className="space-y-6">
-          <div className="flex items-center gap-4 rounded-xl2 border border-bg-line bg-bg-panel p-5">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={data?.logo || ""}
-              alt=""
-              className="h-16 w-16 rounded-2xl bg-bg-soft object-cover"
-              onError={(e) => ((e.target as HTMLImageElement).style.visibility = "hidden")}
-            />
-            <div className="min-w-0">
-              <h1 className="truncate text-2xl font-bold">{agentName}</h1>
-              <div className="font-mono text-sm text-white/40">
-                ${data?.symbol ?? model?.ticker} · {shortAddr(address)}
+      <div className="mt-4 grid gap-4" style={{ gridTemplateColumns: "minmax(0,1.3fr) minmax(0,1fr)" }}>
+        {/* Left */}
+        <div className="flex flex-col gap-4">
+          {/* Header */}
+          <div className="card" style={{ padding: 20 }}>
+            <div className="flex items-center gap-4">
+              <ModelLogo model={model?.model} size={56} radius={16} />
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div className="flex items-center gap-2" style={{ flexWrap: "wrap" }}>
+                  <span style={{ fontWeight: 700, fontSize: 22 }}>{agentName}</span>
+                  {model?.ticker && <span className="mono" style={{ color: "var(--dim)" }}>${model.ticker}</span>}
+                  <span className="badge"><span className="dot" style={{ background: "#7fd18f", color: "#04140e" }}>◗</span> RH</span>
+                </div>
+                <div className="mono" style={{ marginTop: 4, fontSize: 12, color: "var(--dim)" }}>{shortAddr(address)} · by {shortAddr(data?.deployer ?? "")}</div>
               </div>
             </div>
-            <span className="ml-auto rounded-full bg-signature-soft px-3 py-1 text-xs font-semibold text-cyan-soft">
-              agent
-            </span>
+            <div className="flex flex-wrap gap-2" style={{ marginTop: 14 }}>
+              <span className="badge">fees → compute</span>
+              <span className="badge"><span className="dot" style={{ background: p.color, color: p.ink }}>{p.short}</span> {p.name} · {model?.modelName ?? "unlinked"}</span>
+              <span className="badge">Paired with ETH</span>
+            </div>
+            {bio && <p style={{ marginTop: 14, color: "var(--mut)", fontSize: 14.5, lineHeight: 1.6 }}>{bio}</p>}
           </div>
 
-          {bio && <p className="text-white/70">{bio}</p>}
-
-          {/* Brain + personality */}
-          {model && (
-            <div className="rounded-xl2 border border-bg-line bg-bg-panel p-5">
-              <div className="flex flex-wrap items-center gap-3">
-                <div>
-                  <div className="text-xs uppercase tracking-widest text-white/40">Brain</div>
-                  <div className="mt-1 font-semibold text-white">{model.modelName}</div>
-                  <div className="font-mono text-xs text-white/40">{model.model}</div>
-                </div>
-                {model.temperature != null && (
-                  <span className="ml-auto rounded-full border border-bg-line px-3 py-1 font-mono text-xs text-white/60">
-                    temp {model.temperature.toFixed(2)}
-                  </span>
-                )}
-              </div>
-              {model.personality && (
-                <details className="mt-4 group">
-                  <summary className="cursor-pointer text-xs font-medium text-cyan-soft hover:text-cyan">
-                    Personality (system prompt)
-                  </summary>
-                  <p className="mt-2 whitespace-pre-wrap rounded-lg border border-bg-line bg-bg-soft p-3 text-xs text-white/60">
-                    {model.personality}
-                  </p>
-                </details>
-              )}
+          {/* Price + funded */}
+          <div className="grid gap-4" style={{ gridTemplateColumns: "1fr 1fr" }}>
+            <div className="card-2" style={{ padding: 18 }}>
+              <div style={{ fontSize: 13, color: "var(--mut)" }}>Price</div>
+              <div className="num" style={{ fontSize: 24, fontWeight: 700, marginTop: 6 }}>{curve ? `${curve.spotPrice.toPrecision(4)}` : "—"}<span style={{ fontSize: 13, color: "var(--dim)" }}> ETH</span></div>
             </div>
-          )}
+            <div className="card-2" style={{ padding: 18 }}>
+              <div style={{ fontSize: 13, color: "var(--mut)" }}>Compute funded</div>
+              <div className="num" style={{ fontSize: 24, fontWeight: 700, marginTop: 6, color: "var(--cream)" }}>{usd(pool?.creditedUsd ?? 0)}</div>
+            </div>
+          </div>
 
-          {/* Price chart */}
-          <PriceChart token={address} quoteSymbol={isNative ? "ETH" : "quote"} />
+          <div className="card" style={{ padding: 18 }}><PriceChart token={address} quoteSymbol={isNative ? "ETH" : "quote"} /></div>
 
           {/* Curve progress */}
           {curve && !curve.graduated && (
-            <div className="rounded-xl2 border border-bg-line bg-bg-panel p-5">
-              <div className="flex justify-between text-sm">
-                <span className="text-white/60">Bonding-curve progress</span>
-                <span className="font-mono text-cyan-soft">{progressPct}%</span>
+            <div className="card-2" style={{ padding: 18 }}>
+              <div className="flex justify-between" style={{ fontSize: 14 }}><span style={{ color: "var(--mut)" }}>Bonding-curve progress</span><span className="num" style={{ color: "var(--cream)" }}>{progressPct}%</span></div>
+              <div style={{ marginTop: 10, height: 8, borderRadius: 999, background: "var(--bg-soft)", overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${progressPct}%`, background: "var(--cream)", borderRadius: 999 }} />
               </div>
-              <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-bg-soft">
-                <div className="h-full rounded-full bg-signature" style={{ width: `${progressPct}%` }} />
-              </div>
-              <div className="mt-2 text-xs text-white/40">Graduates to Uniswap V4 when the curve fills.</div>
+              <div style={{ marginTop: 8, fontSize: 12, color: "var(--dim)" }}>Graduates to Uniswap V4 when the curve fills.</div>
             </div>
+          )}
+
+          <p className="notice">This is a demo interface. Agents, markets and compute figures may be simulated; tokens can be volatile or lose all value. You sign every transaction — {"Neuma"} does not custody assets or give financial advice.</p>
+        </div>
+
+        {/* Right */}
+        <div className="flex flex-col gap-4">
+          {serialized && data?.curveAddress ? (
+            <TradeWidget curve={data.curveAddress as `0x${string}`} token={address as `0x${string}`} tokenSymbol={data.symbol || model?.ticker || "TOKEN"} quoteIsNative={isNative} quoteDecimals={18} quoteSymbol={isNative ? "ETH" : "quote"} state={serialized} />
+          ) : (
+            <div className="card-2" style={{ padding: 18, fontSize: 14, color: "var(--mut)" }}>Trading isn’t available (not on an active curve, or chain unreachable).</div>
           )}
 
           {/* Compute pool */}
-          <div className="rounded-xl2 border border-cyan/30 bg-signature-soft p-5">
-            <div className="text-xs uppercase tracking-widest text-cyan-soft">Compute pool</div>
-            {model ? (
-              <>
-                <div className="mt-2 text-lg font-semibold text-white">Powers {agentName}’s inference</div>
-                <div className="font-mono text-xs text-white/50">{model.modelName} · {model.model}</div>
-                <div className="mt-4 grid grid-cols-3 gap-3 text-sm">
-                  <Stat label="Funded" value={usd(pool?.creditedUsd ?? 0)} />
-                  <Stat label="Spent" value={usd(pool?.spendUsd ?? 0)} />
-                  <Stat label="Remaining" value={usd(pool?.remainingUsd ?? 0)} />
-                </div>
-                <div className="mt-2 text-xs text-white/40">
-                  Fees generated:{" "}
-                  {curve
-                    ? `${((Number(curve.realQuoteReserve) / 1e18) * (Number(curve.feeBps) / 10000)).toFixed(5)} ETH`
-                    : "—"}{" "}
-                  · funded compute is topped up to OpenRouter by the treasury keeper.
-                </div>
-              </>
-            ) : (
-              <div className="mt-2 text-sm text-white/60">
-                This token has no agent profile yet. Agents launched here register their brain automatically.
-              </div>
-            )}
-          </div>
-
-          {data?.error && (
-            <p className="rounded-lg border border-ember/30 bg-ember/10 p-3 text-sm text-ember">
-              Couldn’t read live chain state: {data.error}
-            </p>
-          )}
-        </div>
-
-        {/* Right column: trade + agent console */}
-        <div className="space-y-6">
-          <div id="trade" />
-          {serialized && data?.curveAddress ? (
-            <TradeWidget
-              curve={data.curveAddress as `0x${string}`}
-              token={address as `0x${string}`}
-              tokenSymbol={data.symbol}
-              quoteIsNative={isNative}
-              quoteDecimals={18}
-              quoteSymbol={isNative ? "ETH" : "quote"}
-              state={serialized}
-            />
-          ) : (
-            <div className="rounded-xl2 border border-bg-line bg-bg-panel p-5 text-sm text-white/50">
-              Trading isn’t available (token not on an active curve, or chain unreachable).
+          <div className="card" style={{ padding: 18 }}>
+            <div className="flex items-center justify-between"><span style={{ fontWeight: 600 }}>Compute pool</span><span className="badge">fees → inference</span></div>
+            <div className="grid gap-2" style={{ gridTemplateColumns: "1fr 1fr 1fr", marginTop: 14 }}>
+              <Stat label="Funded" value={usd(pool?.creditedUsd ?? 0)} />
+              <Stat label="Spent" value={usd(pool?.spendUsd ?? 0)} />
+              <Stat label="Left" value={usd(pool?.remainingUsd ?? 0)} />
             </div>
-          )}
+          </div>
 
           {model && <AgentConsole token={address} agentName={agentName} />}
         </div>
@@ -246,13 +138,12 @@ export default function TokenPage({ params }: { params: { address: string } }) {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-bg-line bg-bg-soft p-3">
-      <div className="text-xs text-white/40">{label}</div>
-      <div className="mt-1 font-mono font-semibold text-white">{value}</div>
+    <div className="card-2" style={{ padding: 12 }}>
+      <div style={{ fontSize: 11, color: "var(--dim)" }}>{label}</div>
+      <div className="num" style={{ marginTop: 4, fontWeight: 700, fontSize: 15 }}>{value}</div>
     </div>
   );
 }
-
 function Shell({ children }: { children: React.ReactNode }) {
-  return <div className="mx-auto max-w-6xl px-4 py-20 text-center text-white/50">{children}</div>;
+  return <div className="wrap" style={{ paddingTop: 80, textAlign: "center", color: "var(--mut)" }}>{children}</div>;
 }

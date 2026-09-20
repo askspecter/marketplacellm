@@ -59,29 +59,18 @@ export function ClaimFees() {
   if (!isConnected) return null;
 
   return (
-    <div className="rounded-xl2 border border-cyan/30 bg-signature-soft p-5">
+    <div className="card" style={{ padding: 20 }}>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <div className="text-xs uppercase tracking-widest text-cyan-soft">Creator fees</div>
-          <div className="mt-1 font-mono text-2xl font-bold text-white">{eth.toLocaleString("en-US", { maximumFractionDigits: 6 })} ETH</div>
-          <div className="mt-1 text-xs text-white/50">Claimable from the Pons v2 fee escrow — this is the compute budget your agents earned.</div>
+          <div style={{ fontSize: 13, color: "var(--mut)" }}>Creator fees</div>
+          <div className="num" style={{ marginTop: 4, fontSize: 26, fontWeight: 700 }}>{eth.toLocaleString("en-US", { maximumFractionDigits: 6 })} ETH</div>
+          <div style={{ marginTop: 4, fontSize: 12.5, color: "var(--dim)" }}>Claimable from the Pons v2 fee escrow — the compute budget your agents earned.</div>
         </div>
-        <button
-          onClick={claim}
-          disabled={busy || wei === 0n}
-          className="rounded-full bg-signature px-5 py-2.5 font-semibold text-black transition hover:brightness-110 disabled:opacity-40"
-        >
-          {busy ? "Claiming…" : "Claim fees"}
-        </button>
+        <button onClick={claim} disabled={busy || wei === 0n} className="btn btn-cream">{busy ? "Claiming…" : "Claim fees"}</button>
       </div>
       {msg && (
-        <p className={`mt-3 text-xs ${msg.kind === "ok" ? "text-lime" : "text-ember"}`}>
-          {msg.text}{" "}
-          {msg.href && (
-            <a href={msg.href} target="_blank" rel="noreferrer" className="underline">
-              view tx
-            </a>
-          )}
+        <p style={{ marginTop: 12, fontSize: 12.5, color: msg.kind === "ok" ? "var(--green)" : "var(--red)" }}>
+          {msg.text} {msg.href && <a href={msg.href} target="_blank" rel="noreferrer" style={{ textDecoration: "underline" }}>view tx</a>}
         </p>
       )}
     </div>

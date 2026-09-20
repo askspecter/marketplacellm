@@ -126,17 +126,17 @@ export default function PortfolioPage() {
 
 function SummaryCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl2 border border-bg-line bg-bg-panel p-4">
-      <div className="text-xs text-white/40">{label}</div>
-      <div className="mt-1 font-mono text-2xl font-bold text-white">{value}</div>
+    <div className="card-2" style={{ padding: 16 }}>
+      <div style={{ fontSize: 13, color: "var(--dim)" }}>{label}</div>
+      <div className="num" style={{ marginTop: 4, fontSize: 24, fontWeight: 700 }}>{value}</div>
     </div>
   );
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-xl2 border border-bg-line bg-bg-panel p-5">
-      <h2 className="mb-3 text-lg font-semibold">{title}</h2>
+    <div className="card" style={{ padding: 20 }}>
+      <h2 style={{ marginBottom: 12, fontSize: 18, fontWeight: 600 }}>{title}</h2>
       {children}
     </div>
   );
@@ -144,12 +144,12 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function Row({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <Link href={href} className="flex items-center justify-between py-3 transition hover:opacity-80">
+    <Link href={href} className="flex items-center justify-between" style={{ padding: "12px 0", borderTop: "1px solid var(--border)" }}>
       {children}
     </Link>
   );
 }
 
 function Muted({ children }: { children: React.ReactNode }) {
-  return <p className="py-4 text-sm text-white/40">{children}</p>;
+  return <p style={{ padding: "16px 0", fontSize: 14, color: "var(--dim)" }}>{children}</p>;
 }

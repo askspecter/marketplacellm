@@ -125,52 +125,37 @@ export function DeployButton({
 
   if (!isConnected) {
     return (
-      <div className="rounded-xl2 border border-bg-line bg-bg-soft p-4 text-center">
-        <p className="mb-3 text-sm text-white/60">Connect a wallet on Robinhood Chain to launch.</p>
-        <div className="flex justify-center">
-          <ConnectButton label="Connect wallet" />
-        </div>
+      <div className="card-2" style={{ padding: 16, textAlign: "center" }}>
+        <p style={{ marginBottom: 12, fontSize: 14, color: "var(--mut)" }}>Connect a wallet on Robinhood Chain to launch.</p>
+        <div className="flex justify-center"><ConnectButton label="Connect wallet" /></div>
       </div>
     );
   }
 
   if (phase === "done") {
     return (
-      <div className="rounded-xl2 border border-lime/40 bg-lime/5 p-4 text-center">
-        <div className="text-lg font-semibold text-lime">Launched 🎉</div>
+      <div className="card-2" style={{ padding: 16, textAlign: "center", borderColor: "rgba(116,200,138,.4)" }}>
+        <div style={{ fontSize: 18, fontWeight: 700, color: "var(--green)" }}>Launched 🎉</div>
         {launchedToken ? (
-          <a href={`/token/${launchedToken}`} className="mt-1 inline-block text-sm text-cyan-soft hover:text-cyan">
-            Open the token page →
-          </a>
+          <a href={`/token/${launchedToken}`} style={{ marginTop: 4, display: "inline-block", fontSize: 14, color: "var(--cream)" }}>Open the agent →</a>
         ) : (
-          <div className="mt-1 text-sm text-white/50">Tx mined. Indexing…</div>
+          <div style={{ marginTop: 4, fontSize: 14, color: "var(--mut)" }}>Tx mined. Indexing…</div>
         )}
       </div>
     );
   }
 
   return (
-    <div className="space-y-3">
-      {warnings.map((w, i) => (
-        <p key={i} className="rounded-lg border border-ember/30 bg-ember/5 p-3 text-xs text-ember/90">
-          ⚠️ {w}
-        </p>
-      ))}
-      {error && <p className="rounded-lg border border-ember/40 bg-ember/10 p-3 text-xs text-ember">{error}</p>}
-
-      <button
-        onClick={launch}
-        disabled={disabled}
-        className="w-full rounded-full bg-signature px-6 py-3 font-semibold text-black shadow-glow transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
-      >
+    <div className="flex flex-col gap-3">
+      {warnings.map((w, i) => (<p key={i} className="notice" style={{ fontSize: 12.5 }}>⚠️ {w}</p>))}
+      {error && <p className="notice" style={{ borderColor: "rgba(239,122,124,.4)", background: "rgba(239,122,124,.08)", color: "var(--red)", fontSize: 12.5 }}>{error}</p>}
+      <button onClick={launch} disabled={disabled} className="btn btn-cream" style={{ width: "100%", padding: 15 }}>
         {phase === "preparing" && "Preparing launch…"}
         {phase === "signing" && "Confirm in wallet…"}
         {phase === "pending" && "Launching on-chain…"}
-        {(phase === "idle" || phase === "error") && `Launch $${ticker.trim().toUpperCase() || "TOKEN"} on Pons v2`}
+        {(phase === "idle" || phase === "error") && `Launch $${ticker.trim().toUpperCase() || "TOKEN"}`}
       </button>
-      <p className="text-center text-[11px] text-white/40">
-        Paired with ETH · fair-launch bonding curve · you sign every tx (non-custodial)
-      </p>
+      <p style={{ textAlign: "center", fontSize: 11, color: "var(--dim)" }}>Paired with ETH · fair-launch bonding curve · you sign every tx</p>
     </div>
   );
 }

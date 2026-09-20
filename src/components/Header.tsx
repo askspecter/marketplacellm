@@ -6,16 +6,16 @@ import { SITE } from "@/lib/site";
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-40" style={{ background: "rgba(10,10,11,.72)", backdropFilter: "blur(10px)", borderBottom: "1px solid var(--line)" }}>
-      <div className="wrap flex items-center gap-8 py-4">
-        <Link href="/" className="display text-2xl" data-hover>
-          {SITE.name.slice(0, 3)}<span style={{ color: "var(--accent)" }}>{SITE.name.slice(3)}</span>
+    <header className="sticky top-0 z-40" style={{ background: "rgba(12,12,13,.78)", backdropFilter: "blur(12px)", borderBottom: "1px solid var(--border)" }}>
+      <div className="wrap flex items-center gap-6 py-3">
+        <Link href="/" className="flex items-center gap-2.5">
+          <span style={{ width: 34, height: 34, borderRadius: 10, background: "var(--cream)", color: "var(--cream-ink)", display: "grid", placeItems: "center", fontWeight: 800, fontSize: 18 }}>◗</span>
+          <span style={{ fontWeight: 700, fontSize: 19, letterSpacing: "-.01em" }}>{SITE.name}</span>
         </Link>
-        <nav className="ml-6 hidden items-center gap-7 sm:flex" style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: ".14em", textTransform: "uppercase" }}>
-          <Link href="/create" style={{ color: "var(--mut)" }} className="transition hover:!text-[var(--ink)]">Launch</Link>
-          <Link href="/#agents" style={{ color: "var(--mut)" }} className="transition hover:!text-[var(--ink)]">Agents</Link>
-          <Link href="/compute" style={{ color: "var(--mut)" }} className="transition hover:!text-[var(--ink)]">Compute</Link>
-          <Link href="/portfolio" style={{ color: "var(--mut)" }} className="transition hover:!text-[var(--ink)]">Portfolio</Link>
+        <nav className="ml-4 hidden items-center gap-6 sm:flex" style={{ fontSize: 15 }}>
+          {[["Explore", "/"], ["Create", "/create"], ["Portfolio", "/portfolio"], ["Compute", "/compute"]].map(([l, h]) => (
+            <Link key={l} href={h} style={{ color: "var(--mut)" }} className="transition-colors hover:text-[var(--text)]">{l}</Link>
+          ))}
         </nav>
         <div className="ml-auto">
           <ConnectButton accountStatus="address" chainStatus="icon" showBalance={false} label="Connect" />

@@ -1,94 +1,113 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { LaunchFeed } from "@/components/LaunchFeed";
+import { ModelLogo } from "@/components/ModelLogo";
+import { providerFromId, modelTail } from "@/lib/models";
+import { shortAddr } from "@/lib/format";
 
-const TICKER = [
-  "Autonomous agents",
-  "Every agent alive",
-  "Trading → compute → inference",
-  "400+ models",
-  "Robinhood Chain",
-  "Self-funding intelligence",
-];
+interface Item {
+  token: string;
+  deployer: string;
+  model: string | null;
+  modelName: string | null;
+  agentName: string | null;
+  ticker: string | null;
+  bio: string | null;
+}
 
-const LOOP = [
-  ["01", "Define the agent", "A name, a personality, a temperament. Its voice is yours to write."],
-  ["02", "Choose a brain", "Any of 400+ OpenRouter models — Claude, GPT, Llama, DeepSeek."],
-  ["03", "Launch with a token", "One Pons v2 transaction. A bonding curve, paired with ETH."],
-  ["04", "It funds itself", "Trading fees become compute. The market keeps it thinking."],
-];
+type Tab = "trending" | "new";
 
-export default function HomePage() {
+export default function ExplorePage() {
+  const [items, setItems] = useState<Item[] | null>(null);
+  const [q, setQ] = useState("");
+  const [tab, setTab] = useState<Tab>("trending");
+
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/launches")
+      .then((r) => r.json())
+      .then((d) => alive && setItems(d.launches ?? []))
+      .catch(() => alive && setItems([]));
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const list = useMemo(() => {
+    let l = items ?? [];
+    const s = q.trim().toLowerCase();
+    if (s) l = l.filter((it) => `${it.agentName} ${it.ticker} ${it.modelName}`.toLowerCase().includes(s));
+    return l;
+  }, [items, q, tab]);
+
   return (
-    <>
-      {/* Marquee */}
-      <div className="marquee" style={{ borderBottom: "1px solid var(--line)" }}>
-        <div className="marquee__track" style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: ".24em", textTransform: "uppercase", padding: "10px 0" }}>
-          {[...TICKER, ...TICKER].map((t, i) => (
-            <span key={i} style={{ color: i % 2 ? "var(--accent)" : "var(--ink)" }}>{t} <span style={{ color: "var(--accent)" }}>✳</span></span>
-          ))}
-        </div>
+    <div className="wrap" style={{ paddingTop: 22, paddingBottom: 40 }}>
+      {/* Search + create */}
+      <div className="flex gap-3" style={{ marginBottom: 26 }}>
+        <input className="input" placeholder="Search agents by name, ticker or model…" value={q} onChange={(e) => setQ(e.target.value)} />
+        <Link href="/create" className="btn btn-cream" style={{ whiteSpace: "nowrap" }}>+ Launch</Link>
       </div>
 
-      {/* Hero */}
-      <section className="wrap" style={{ paddingTop: 56, paddingBottom: 40 }}>
-        <div className="reveal eyebrow" style={{ marginBottom: 22 }}>Index 01/04 — Autonomous intelligence, on-chain</div>
-        <h1 className="display" style={{ fontSize: "clamp(60px, 13vw, 190px)" }}>
-          <span className="reveal" style={{ display: "block" }}>Every</span>
-          <span className="reveal stroke" data-d="1" style={{ display: "block" }}>agent</span>
-          <span className="reveal echo" data-d="2" data-text="alive." style={{ display: "block", color: "var(--accent)" }}>alive.</span>
-        </h1>
+      {/* Heading + count */}
+      <div className="flex items-center gap-3" style={{ marginBottom: 18 }}>
+        <h1 style={{ fontSize: 34, fontWeight: 700, letterSpacing: "-.02em" }}>Explore</h1>
+        <span className="pill pill--sm">{items ? items.length : "—"} launched</span>
+      </div>
 
-        <div className="reveal" data-d="3" style={{ marginTop: 40, display: "flex", flexWrap: "wrap", alignItems: "flex-end", justifyContent: "space-between", gap: 32 }}>
-          <p className="serif-it" style={{ fontSize: "clamp(22px, 2.6vw, 34px)", maxWidth: "24ch", color: "var(--ink)" }}>
-            Launch an agent with a mind, a market, and a treasury of compute — intelligence that funds its own existence.
-          </p>
-          <div style={{ display: "flex", alignItems: "center", gap: 22 }}>
-            <Link href="/create" className="btn btn--accent" data-hover>Launch an agent →</Link>
-            <Link href="/#agents" className="link-u" data-hover>The collection</Link>
-          </div>
+      {/* Tabs + chain filter */}
+      <div className="flex flex-wrap items-center gap-2" style={{ marginBottom: 22 }}>
+        <button className={`pill ${tab === "trending" ? "pill--active" : ""}`} onClick={() => setTab("trending")}>Trending</button>
+        <button className={`pill ${tab === "new" ? "pill--active" : ""}`} onClick={() => setTab("new")}>New</button>
+        <span style={{ width: 12 }} />
+        <span className="badge"><span className="dot" style={{ background: "#7fd18f", color: "#04140e" }}>◗</span> Robinhood</span>
+      </div>
+
+      {/* Grid */}
+      {items === null ? (
+        <Grid>{Array.from({ length: 6 }).map((_, i) => <div key={i} className="card" style={{ height: 300, opacity: 0.5 }} />)}</Grid>
+      ) : list.length === 0 ? (
+        <div className="card" style={{ padding: 48, textAlign: "center", color: "var(--mut)" }}>
+          No agents yet. <Link href="/create" style={{ color: "var(--text)", textDecoration: "underline" }}>Launch the first →</Link>
         </div>
-      </section>
+      ) : (
+        <Grid>{list.map((it) => <AgentCard key={it.token} it={it} />)}</Grid>
+      )}
+    </div>
+  );
+}
 
-      <div className="wrap"><div className="hairline reveal" /></div>
+function Grid({ children }: { children: React.ReactNode }) {
+  return <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>{children}</div>;
+}
 
-      {/* The loop */}
-      <section className="wrap" style={{ paddingTop: 80, paddingBottom: 40 }}>
-        <div className="reveal kicker" style={{ marginBottom: 34 }}>The loop</div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 1, background: "var(--line)", border: "1px solid var(--line)" }}>
-          {LOOP.map(([n, t, d], i) => (
-            <div key={n} className="reveal" data-d={String((i % 3) + 1)} style={{ background: "var(--bg)", padding: "34px 28px" }}>
-              <div className="mono" style={{ color: "var(--accent)", fontSize: 13, letterSpacing: ".2em" }}>{n}</div>
-              <h3 className="display" style={{ fontSize: 26, marginTop: 20 }}>{t}</h3>
-              <p style={{ marginTop: 12, fontSize: 14, lineHeight: 1.6, color: "var(--mut)" }}>{d}</p>
-            </div>
-          ))}
+function AgentCard({ it }: { it: Item }) {
+  const p = providerFromId(it.model ?? undefined);
+  return (
+    <Link href={`/token/${it.token}`} className="card" style={{ overflow: "hidden", display: "block" }}>
+      {/* Art */}
+      <div style={{ position: "relative", aspectRatio: "1.35 / 1", background: `radial-gradient(120% 120% at 30% 20%, ${p.color}44, transparent 60%), var(--card-2)`, display: "grid", placeItems: "center", borderBottom: "1px solid var(--border)" }}>
+        <div style={{ position: "absolute", top: 12, left: 12, display: "flex", gap: 6 }}>
+          <span className="badge"><span className="dot" style={{ background: "#7fd18f", color: "#04140e" }}>◗</span> RH</span>
+          <span className="badge"><span className="dot" style={{ background: p.color, color: p.ink }}>{p.short}</span> {p.name}</span>
         </div>
-        <p className="reveal serif-it" style={{ marginTop: 40, fontSize: "clamp(20px,2.4vw,30px)", maxWidth: "30ch", color: "var(--mut)" }}>
-          Trading → fees → compute → inference → <span style={{ color: "var(--ink)" }}>agents that act.</span>
-        </p>
-      </section>
-
-      {/* Living agents */}
-      <section id="agents" className="wrap" style={{ paddingTop: 60, paddingBottom: 40 }}>
-        <div className="reveal" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 26 }}>
-          <h2 className="display" style={{ fontSize: "clamp(36px,5vw,72px)" }}>Living agents</h2>
-          <Link href="/create" className="link-u" data-hover>+ Launch</Link>
+        <ModelLogo model={it.model ?? undefined} size={92} radius={22} />
+        <span style={{ position: "absolute", bottom: 12, left: 12 }} className="badge">fees → compute</span>
+      </div>
+      {/* Meta */}
+      <div style={{ padding: 16 }}>
+        <div className="flex items-baseline justify-between gap-2">
+          <span style={{ fontWeight: 700, fontSize: 18 }}>{it.agentName ?? "Unnamed agent"}</span>
+          {it.ticker && <span className="mono" style={{ color: "var(--dim)", fontSize: 13 }}>${it.ticker}</span>}
         </div>
-        <div className="reveal"><LaunchFeed /></div>
-      </section>
-
-      {/* CTA band */}
-      <section style={{ borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)", marginTop: 40 }}>
-        <div className="wrap" style={{ padding: "90px 40px", textAlign: "center" }}>
-          <h2 className="reveal display" style={{ fontSize: "clamp(44px,9vw,140px)" }}>
-            Give it a <span className="serif-it" style={{ color: "var(--accent)" }}>mind.</span>
-          </h2>
-          <div className="reveal" data-d="1" style={{ marginTop: 34, display: "flex", justifyContent: "center", gap: 20, flexWrap: "wrap" }}>
-            <Link href="/create" className="btn btn--accent" data-hover>Launch an agent →</Link>
-            <Link href="/compute" className="btn btn--ghost" data-hover>Open compute</Link>
-          </div>
+        <div className="mono" style={{ marginTop: 6, color: "var(--mut)", fontSize: 13, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+          {it.modelName ?? modelTail(it.model ?? "") ?? "— unlinked —"}
         </div>
-      </section>
-    </>
+        <div className="mono flex items-center justify-between" style={{ marginTop: 14, color: "var(--dim)", fontSize: 12 }}>
+          <span>{shortAddr(it.token)}</span>
+          <span>by {shortAddr(it.deployer)}</span>
+        </div>
+      </div>
+    </Link>
   );
 }

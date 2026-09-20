@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useAccount, useChainId, useSwitchChain, useWriteContract } from "wagmi";
-import { parseEther, parseUnits, formatUnits, zeroAddress, type Abi } from "viem";
+import { parseEther, parseUnits, formatUnits, type Abi } from "viem";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { v2CurveAbi } from "@/lib/pons/abisV2";
 import { quoteBuy, quoteSell, withSlippage, type CurveQuoteInputs } from "@/lib/pons/quote";
@@ -13,30 +13,11 @@ const erc20ApproveAbi = [
 ] as const;
 
 export interface CurveInputsSerialized {
-  quoteReserve: string;
-  tokenReserve: string;
-  sellableTokens: string;
-  feeBps: string;
-  creatorTaxBps: string;
-  graduated: boolean;
+  quoteReserve: string; tokenReserve: string; sellableTokens: string; feeBps: string; creatorTaxBps: string; graduated: boolean;
 }
 
-export function TradeWidget({
-  curve,
-  token,
-  tokenSymbol,
-  quoteIsNative,
-  quoteDecimals,
-  quoteSymbol,
-  state,
-}: {
-  curve: `0x${string}`;
-  token: `0x${string}`;
-  tokenSymbol: string;
-  quoteIsNative: boolean;
-  quoteDecimals: number;
-  quoteSymbol: string;
-  state: CurveInputsSerialized;
+export function TradeWidget({ curve, token, tokenSymbol, quoteIsNative, quoteDecimals, quoteSymbol, state }: {
+  curve: `0x${string}`; token: `0x${string}`; tokenSymbol: string; quoteIsNative: boolean; quoteDecimals: number; quoteSymbol: string; state: CurveInputsSerialized;
 }) {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
@@ -48,160 +29,87 @@ export function TradeWidget({
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
 
-  const inputs: CurveQuoteInputs = useMemo(
-    () => ({
-      quoteReserve: BigInt(state.quoteReserve),
-      tokenReserve: BigInt(state.tokenReserve),
-      sellableTokens: BigInt(state.sellableTokens),
-      feeBps: BigInt(state.feeBps),
-      creatorTaxBps: BigInt(state.creatorTaxBps),
-    }),
-    [state]
-  );
+  const inputs: CurveQuoteInputs = useMemo(() => ({
+    quoteReserve: BigInt(state.quoteReserve), tokenReserve: BigInt(state.tokenReserve), sellableTokens: BigInt(state.sellableTokens),
+    feeBps: BigInt(state.feeBps), creatorTaxBps: BigInt(state.creatorTaxBps),
+  }), [state]);
 
-  // Live estimate of what the user receives.
+  const feePct = (Number(state.feeBps) / 100).toFixed(0);
+  const taxPct = (Number(state.creatorTaxBps) / 100).toFixed(0);
+
   const estimate = useMemo(() => {
     if (!amount || Number(amount) <= 0) return null;
     try {
       if (side === "buy") {
         const quoteIn = quoteIsNative ? parseEther(amount) : parseUnits(amount, quoteDecimals);
-        const q = quoteBuy(quoteIn, inputs);
-        return { out: q.tokensOut, outLabel: tokenSymbol, dp: 18 };
+        return { out: quoteBuy(quoteIn, inputs).tokensOut, label: tokenSymbol, dp: 18 };
       }
-      const tokensIn = parseUnits(amount, 18);
-      const out = quoteSell(tokensIn, inputs);
-      return { out, outLabel: quoteSymbol, dp: quoteDecimals };
-    } catch {
-      return null;
-    }
+      return { out: quoteSell(parseUnits(amount, 18), inputs), label: quoteSymbol, dp: quoteDecimals };
+    } catch { return null; }
   }, [amount, side, inputs, quoteIsNative, quoteDecimals, tokenSymbol, quoteSymbol]);
 
-  const graduated = state.graduated;
-
-  async function ensureChain() {
-    if (chainId !== robinhoodChain.id) await switchChainAsync({ chainId: robinhoodChain.id });
+  if (state.graduated) {
+    return <div className="card" style={{ padding: 18, fontSize: 14, color: "var(--mut)" }}>This agent has <span className="up">graduated</span> to Uniswap V4 — trade it on the DEX pool.</div>;
   }
 
   async function submit() {
     if (!address || !amount || Number(amount) <= 0) return;
-    setBusy(true);
-    setMsg(null);
+    setBusy(true); setMsg(null);
     try {
-      await ensureChain();
+      if (chainId !== robinhoodChain.id) await switchChainAsync({ chainId: robinhoodChain.id });
       if (side === "buy") {
         const quoteIn = quoteIsNative ? parseEther(amount) : parseUnits(amount, quoteDecimals);
-        const est = quoteBuy(quoteIn, inputs);
-        const minOut = withSlippage(est.tokensOut, 300); // 3% slippage
-        await writeContractAsync({
-          address: curve,
-          abi: v2CurveAbi as Abi,
-          functionName: "buy",
-          args: [quoteIn, minOut, address],
-          value: quoteIsNative ? quoteIn : 0n,
-        });
-        setMsg({ kind: "ok", text: "Buy submitted. Fees just funded this token's compute." });
+        const minOut = withSlippage(quoteBuy(quoteIn, inputs).tokensOut, 300);
+        await writeContractAsync({ address: curve, abi: v2CurveAbi as Abi, functionName: "buy", args: [quoteIn, minOut, address], value: quoteIsNative ? quoteIn : 0n });
+        setMsg({ kind: "ok", text: "Buy submitted — fees just funded this agent's compute." });
       } else {
         const tokensIn = parseUnits(amount, 18);
-        const est = quoteSell(tokensIn, inputs);
-        const minOut = withSlippage(est, 300);
-        // ERC-20 launch token: approve the curve to pull tokens, then sell.
-        await writeContractAsync({
-          address: token,
-          abi: erc20ApproveAbi as unknown as Abi,
-          functionName: "approve",
-          args: [curve, tokensIn],
-        });
-        await writeContractAsync({
-          address: curve,
-          abi: v2CurveAbi as Abi,
-          functionName: "sell",
-          args: [tokensIn, minOut, address],
-        });
+        const minOut = withSlippage(quoteSell(tokensIn, inputs), 300);
+        await writeContractAsync({ address: token, abi: erc20ApproveAbi as unknown as Abi, functionName: "approve", args: [curve, tokensIn] });
+        await writeContractAsync({ address: curve, abi: v2CurveAbi as Abi, functionName: "sell", args: [tokensIn, minOut, address] });
         setMsg({ kind: "ok", text: "Sell submitted." });
       }
       setAmount("");
-    } catch (e) {
-      setMsg({ kind: "err", text: (e instanceof Error ? e.message : "Trade failed.").slice(0, 200) });
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  if (graduated) {
-    return (
-      <div className="rounded-xl2 border border-bg-line bg-bg-panel p-5 text-sm text-white/60">
-        This token has <span className="text-lime">graduated</span> to Uniswap V4 — trade it on the DEX pool. The curve is closed.
-      </div>
-    );
+    } catch (e) { setMsg({ kind: "err", text: (e instanceof Error ? e.message : "Trade failed.").slice(0, 180) }); }
+    finally { setBusy(false); }
   }
 
   return (
-    <div className="rounded-xl2 border border-bg-line bg-bg-panel p-5">
-      <div className="mb-4 flex rounded-lg bg-bg-soft p-1">
+    <div className="card" style={{ padding: 18 }}>
+      <div className="seg" style={{ marginBottom: 16 }}>
         {(["buy", "sell"] as const).map((s) => (
-          <button
-            key={s}
-            onClick={() => setSide(s)}
-            className={`flex-1 rounded-md py-2 text-sm font-semibold capitalize transition ${
-              side === s
-                ? s === "buy"
-                  ? "bg-lime text-black"
-                  : "bg-ember text-black"
-                : "text-white/50 hover:text-white"
-            }`}
-          >
-            {s}
-          </button>
+          <button key={s} onClick={() => setSide(s)} style={{ textTransform: "capitalize",
+            background: side === s ? (s === "buy" ? "var(--green)" : "var(--red)") : "transparent",
+            color: side === s ? "#08240f" : "var(--mut)" }}>{s}</button>
         ))}
       </div>
 
-      <label className="block">
-        <span className="mb-1 block text-xs text-white/50">
-          {side === "buy" ? `Spend (${quoteSymbol})` : `Sell (${tokenSymbol})`}
-        </span>
-        <input
-          value={amount}
-          onChange={(e) => setAmount(e.target.value.replace(/[^0-9.]/g, ""))}
-          inputMode="decimal"
-          placeholder="0.0"
-          className="w-full rounded-lg border border-bg-line bg-bg-soft px-3 py-3 text-lg font-mono outline-none focus:border-cyan/50"
-        />
+      <label style={{ display: "block" }}>
+        <span style={{ display: "block", fontSize: 13, color: "var(--mut)", marginBottom: 6 }}>{side === "buy" ? `You pay (${quoteSymbol})` : `You sell (${tokenSymbol})`}</span>
+        <input className="input num" value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^0-9.]/g, ""))} inputMode="decimal" placeholder="0.0" style={{ fontSize: 20 }} />
       </label>
 
       {estimate && (
-        <div className="mt-2 flex justify-between text-sm">
-          <span className="text-white/50">You receive ≈</span>
-          <span className="font-mono text-white">
-            {Number(formatUnits(estimate.out, estimate.dp)).toLocaleString("en-US", { maximumFractionDigits: 4 })}{" "}
-            {estimate.outLabel}
-          </span>
+        <div className="flex justify-between" style={{ marginTop: 10, fontSize: 14 }}>
+          <span style={{ color: "var(--mut)" }}>You receive ≈</span>
+          <span className="num">{Number(formatUnits(estimate.out, estimate.dp)).toLocaleString("en-US", { maximumFractionDigits: 4 })} {estimate.label}</span>
         </div>
       )}
 
-      {msg && (
-        <p className={`mt-3 rounded-lg p-2 text-xs ${msg.kind === "ok" ? "bg-lime/10 text-lime" : "bg-ember/10 text-ember"}`}>
-          {msg.text}
-        </p>
-      )}
+      <div style={{ marginTop: 12, fontSize: 12.5, color: "var(--dim)" }}>Pool fee: <span style={{ color: "var(--mut)" }}>{feePct}% ({(Number(feePct) - Number(taxPct)).toFixed(0)}% base + {taxPct}% creator tax)</span></div>
 
-      <div className="mt-4">
+      {msg && <p style={{ marginTop: 12, borderRadius: 12, padding: "10px 12px", fontSize: 12.5, background: msg.kind === "ok" ? "rgba(116,200,138,.1)" : "rgba(239,122,124,.1)", color: msg.kind === "ok" ? "var(--green)" : "var(--red)" }}>{msg.text}</p>}
+
+      <div style={{ marginTop: 14 }}>
         {isConnected ? (
-          <button
-            onClick={submit}
-            disabled={busy || !amount}
-            className="w-full rounded-full bg-signature py-3 font-semibold text-black transition hover:brightness-110 disabled:opacity-40"
-          >
+          <button onClick={submit} disabled={busy || !amount} className={`btn ${side === "buy" ? "btn-green" : "btn-red"}`} style={{ width: "100%", padding: 15 }}>
             {busy ? "Submitting…" : side === "buy" ? `Buy ${tokenSymbol}` : `Sell ${tokenSymbol}`}
           </button>
         ) : (
-          <div className="flex justify-center">
-            <ConnectButton label="Connect to trade" />
-          </div>
+          <div className="flex justify-center"><ConnectButton label="Connect wallet to trade" /></div>
         )}
       </div>
-      <p className="mt-2 text-center text-[11px] text-white/40">
-        3% slippage · pair {quoteSymbol === "ETH" && quoteIsNative ? "native ETH" : quoteSymbol} · curve {zeroAddress === curve ? "—" : ""}
-      </p>
+      <p style={{ marginTop: 10, textAlign: "center", fontSize: 11, color: "var(--dim)" }}>3% slippage · pair {quoteSymbol} · non-custodial</p>
     </div>
   );
 }

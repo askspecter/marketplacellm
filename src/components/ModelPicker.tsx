@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { ModelLogo } from "@/components/ModelLogo";
 import { perM } from "@/lib/format";
 
 export interface PickerModel {
@@ -14,13 +15,7 @@ export interface PickerModel {
   free: boolean;
 }
 
-export function ModelPicker({
-  value,
-  onChange,
-}: {
-  value: PickerModel | null;
-  onChange: (m: PickerModel) => void;
-}) {
+export function ModelPicker({ value, onChange }: { value: PickerModel | null; onChange: (m: PickerModel) => void }) {
   const [models, setModels] = useState<PickerModel[] | null>(null);
   const [q, setQ] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -43,51 +38,34 @@ export function ModelPicker({
   const filtered = useMemo(() => {
     if (!models) return [];
     const s = q.trim().toLowerCase();
-    const list = s
-      ? models.filter((m) => m.id.toLowerCase().includes(s) || m.name.toLowerCase().includes(s))
-      : models;
-    return list.slice(0, 60);
+    const l = s ? models.filter((m) => m.id.toLowerCase().includes(s) || m.name.toLowerCase().includes(s)) : models;
+    return l.slice(0, 60);
   }, [models, q]);
 
   return (
-    <div className="rounded-xl2 border border-bg-line bg-bg-soft p-3">
-      <input
-        value={q}
-        onChange={(e) => setQ(e.target.value)}
-        placeholder={models ? `Search ${models.length} models…` : "Loading models…"}
-        className="w-full rounded-lg border border-bg-line bg-bg-panel px-3 py-2 text-sm outline-none placeholder:text-white/30 focus:border-cyan/50"
-      />
-      {error && <div className="mt-2 text-xs text-ember">{error}</div>}
-
-      <div className="mt-3 max-h-72 space-y-1 overflow-y-auto pr-1">
-        {models === null && <div className="p-4 text-center text-sm text-white/40">Loading OpenRouter catalog…</div>}
+    <div className="card-2" style={{ padding: 12 }}>
+      <input className="input" style={{ borderRadius: 12 }} value={q} onChange={(e) => setQ(e.target.value)} placeholder={models ? `Search ${models.length} models…` : "Loading models…"} />
+      {error && <div style={{ marginTop: 8, fontSize: 12, color: "var(--red)" }}>{error}</div>}
+      <div style={{ marginTop: 10, maxHeight: 288, overflowY: "auto", display: "flex", flexDirection: "column", gap: 4 }}>
+        {models === null && <div style={{ padding: 16, textAlign: "center", color: "var(--dim)", fontSize: 14 }}>Loading catalog…</div>}
         {filtered.map((m) => {
           const active = value?.id === m.id;
           return (
-            <button
-              key={m.id}
-              type="button"
-              onClick={() => onChange(m)}
-              className={`flex w-full items-center justify-between gap-3 rounded-lg border px-3 py-2 text-left transition ${
-                active ? "border-cyan/60 bg-signature-soft" : "border-transparent hover:border-bg-line hover:bg-bg-panel"
-              }`}
-            >
-              <div className="min-w-0">
-                <div className="truncate text-sm font-medium text-white">{m.name}</div>
-                <div className="truncate font-mono text-[11px] text-white/40">{m.id}</div>
+            <button key={m.id} type="button" onClick={() => onChange(m)}
+              style={{ display: "flex", alignItems: "center", gap: 12, textAlign: "left", padding: 10, borderRadius: 12, cursor: "pointer",
+                background: active ? "rgba(243,234,208,.10)" : "transparent", border: `1px solid ${active ? "var(--border-2)" : "transparent"}` }}>
+              <ModelLogo model={m.id} size={34} radius={10} />
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div style={{ fontSize: 14, fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{m.name}</div>
+                <div className="mono" style={{ fontSize: 11, color: "var(--dim)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{m.id}</div>
               </div>
-              <div className="shrink-0 text-right">
-                <div className="font-mono text-[11px] text-white/60">
-                  {m.free ? <span className="text-lime">Free</span> : `${perM(m.promptPerM)}/M in`}
-                </div>
-                <div className="font-mono text-[10px] text-white/30">{(m.contextLength / 1000).toFixed(0)}K ctx</div>
+              <div className="mono" style={{ textAlign: "right", fontSize: 11, color: "var(--mut)", flexShrink: 0 }}>
+                {m.free ? <span className="up">Free</span> : `${perM(m.promptPerM)}/M`}
               </div>
             </button>
           );
         })}
-        {models && filtered.length === 0 && (
-          <div className="p-4 text-center text-sm text-white/40">No models match “{q}”.</div>
-        )}
+        {models && filtered.length === 0 && <div style={{ padding: 16, textAlign: "center", color: "var(--dim)", fontSize: 14 }}>No models match “{q}”.</div>}
       </div>
     </div>
   );
