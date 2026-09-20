@@ -363,6 +363,16 @@ export async function getQuoteMeta(curve: Address): Promise<{ isNative: boolean;
   }
 }
 
+/** Total ERC-20 supply (raw, in token base units) for market-cap display. */
+export async function readTotalSupplyV2(token: Address): Promise<bigint> {
+  const client = ponsClient();
+  return (await client.readContract({
+    address: token,
+    abi: v2TokenAbi,
+    functionName: "totalSupply",
+  })) as bigint;
+}
+
 export async function readTokenInfoV2(token: Address): Promise<TokenInfoV2> {
   const client = ponsClient();
   const [name, symbol, decimals, info] = await Promise.all([

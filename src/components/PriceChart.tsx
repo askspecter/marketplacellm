@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { usd } from "@/lib/format";
+import { usdPrice, smallNum } from "@/lib/format";
 
 interface Point {
   block: number;
@@ -117,7 +117,7 @@ export function PriceChart({
         <div>
           <div className="mono" style={{ fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--dim)" }}>Price ({usdMode ? "USD" : quoteSymbol})</div>
           <div className="num" style={{ marginTop: 4, fontSize: 24, fontWeight: 700 }}>
-            {usdMode ? usd(lastVal, 6) : `${lastVal.toPrecision(4)} ${quoteSymbol}`}
+            {usdMode ? usdPrice(lastVal) : `${smallNum(lastVal)} ${quoteSymbol}`}
           </div>
         </div>
         <span className="mono" style={{ fontSize: 14, fontWeight: 600, color: up ? "var(--green)" : "var(--red)" }}>

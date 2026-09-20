@@ -1,6 +1,17 @@
 import { NextResponse } from "next/server";
 import { isAddress, zeroAddress, type Address } from "viem";
-import { getCurveState, getLaunchedTokenV2, phaseLabel, readTokenInfoV2 } from "@/lib/pons/readerV2";
+import { getCurveState, getLaunchedTokenV2, phaseLabel, readTokenInfoV2, readTotalSupplyV2 } from "@/lib/pons/readerV2";
+
+async function getEthUsd(): Promise<number | null> {
+  try {
+    const res = await fetch("https://coins.llama.fi/prices/current/coingecko:ethereum", { cache: "no-store" });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { coins?: Record<string, { price?: number }> };
+    return data.coins?.["coingecko:ethereum"]?.price ?? null;
+  } catch {
+    return null;
+  }
+}
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -19,7 +30,12 @@ export async function GET(req: Request) {
   const token = address as Address;
 
   try {
-    const [record, info] = await Promise.all([getLaunchedTokenV2(token), readTokenInfoV2(token)]);
+    const [record, info, totalSupply, ethUsd] = await Promise.all([
+      getLaunchedTokenV2(token),
+      readTokenInfoV2(token),
+      readTotalSupplyV2(token).catch(() => null),
+      getEthUsd(),
+    ]);
     if (!record.exists) {
       return NextResponse.json({ error: "No Pons v2 launch found for this token." }, { status: 404 });
     }
@@ -37,6 +53,8 @@ export async function GET(req: Request) {
       decimals: info.decimals,
       logo: info.logo,
       description: info.description,
+      totalSupply: totalSupply != null ? totalSupply.toString() : null,
+      ethUsd,
       deployer: record.deployer,
       curveAddress: record.curve,
       pairToken: record.pairToken,

@@ -9,10 +9,11 @@ import { AgentConsole } from "@/components/AgentConsole";
 import { ModelLogo } from "@/components/ModelLogo";
 import { RhBadge } from "@/components/RhBadge";
 import { providerFromId } from "@/lib/models";
-import { shortAddr, usd } from "@/lib/format";
+import { shortAddr, usd, usdPrice, usdFull, smallNum } from "@/lib/format";
 
 interface TokenData {
   token: string; name: string; symbol: string; decimals: number; logo: string; description: string;
+  totalSupply?: string | null; ethUsd?: number | null;
   deployer: string; curveAddress: string; pairToken: string; phase: number; phaseLabel: string;
   curve: { quoteReserve: string; tokenReserve: string; realQuoteReserve: string; graduationThreshold: string; sellableTokens: string; graduated: boolean; progress: number; spotPrice: number; feeBps: string; creatorTaxBps: string; } | null;
   error?: string;
@@ -52,6 +53,16 @@ export default function AgentPage({ params }: { params: { address: string } }) {
   const progressPct = curve ? Math.min(100, Math.round(curve.progress * 100)) : 0;
   const p = providerFromId(model?.model);
 
+  // Price + market cap (pons-style). Spot price is the curve's marginal price
+  // in ETH; USD/market-cap need the live ETH rate and the token's total supply.
+  const priceEth = curve?.spotPrice ?? 0;
+  const ethUsd = data?.ethUsd ?? null;
+  const priceUsd = ethUsd != null && priceEth > 0 ? priceEth * ethUsd : null;
+  const decimals = data?.decimals ?? 18;
+  const supplyTokens = data?.totalSupply ? Number(data.totalSupply) / 10 ** decimals : 1_000_000_000;
+  const marketCapUsd = priceUsd != null ? priceUsd * supplyTokens : null;
+  const marketLabel = data ? (data.phase === 0 ? "Bonding curve" : "Uniswap V4") : "—";
+
   const serialized: CurveInputsSerialized | null = curve ? {
     quoteReserve: curve.quoteReserve, tokenReserve: curve.tokenReserve, sellableTokens: curve.sellableTokens,
     feeBps: curve.feeBps, creatorTaxBps: curve.creatorTaxBps, graduated: curve.graduated,
@@ -90,16 +101,23 @@ export default function AgentPage({ params }: { params: { address: string } }) {
             {bio && <p style={{ marginTop: 14, color: "var(--mut)", fontSize: 14.5, lineHeight: 1.6 }}>{bio}</p>}
           </div>
 
-          {/* Price + funded */}
-          <div className="duo">
-            <div className="card-2" style={{ padding: 15 }}>
-              <div style={{ fontSize: 13, color: "var(--mut)" }}>Price</div>
-              <div className="num" style={{ fontSize: 24, fontWeight: 700, marginTop: 6 }}>{curve ? `${curve.spotPrice.toPrecision(4)}` : "—"}<span style={{ fontSize: 13, color: "var(--dim)" }}> ETH</span></div>
+          {/* Market stats (pons-style grid) */}
+          <div className="card" style={{ overflow: "hidden" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
+              <MarketCell label="Price" value={priceUsd != null ? usdPrice(priceUsd) : "—"} />
+              <MarketCell label="Market cap" value={marketCapUsd != null ? usdFull(marketCapUsd) : "—"} style={{ borderLeft: "1px solid var(--border)" }} />
+              <MarketCell label="Price in ETH" value={priceEth > 0 ? `${smallNum(priceEth)} ETH` : "—"} style={{ borderTop: "1px solid var(--border)" }} />
+              <MarketCell label="Market" value={marketLabel} style={{ borderTop: "1px solid var(--border)", borderLeft: "1px solid var(--border)" }} />
             </div>
-            <div className="card-2" style={{ padding: 15 }}>
-              <div style={{ fontSize: 13, color: "var(--mut)" }}>Compute funded</div>
-              <div className="num" style={{ fontSize: 24, fontWeight: 700, marginTop: 6, color: "var(--cream)" }}>{usd(pool?.creditedUsd ?? 0)}</div>
+          </div>
+
+          {/* Compute funded — Neuma's signature stat */}
+          <div className="card-2" style={{ padding: 15 }}>
+            <div className="flex items-center justify-between">
+              <span style={{ fontSize: 13, color: "var(--mut)" }}>Compute funded</span>
+              <span className="badge">fees → compute</span>
             </div>
+            <div className="num" style={{ fontSize: 24, fontWeight: 700, marginTop: 6, color: "var(--cream)" }}>{usd(pool?.creditedUsd ?? 0)}</div>
           </div>
 
           <div className="card" style={{ padding: 15 }}><PriceChart token={address} quoteSymbol={isNative ? "ETH" : "quote"} /></div>
@@ -165,6 +183,15 @@ export default function AgentPage({ params }: { params: { address: string } }) {
           {model && <AgentConsole token={address} agentName={agentName} />}
         </div>
       </div>
+    </div>
+  );
+}
+
+function MarketCell({ label, value, style }: { label: string; value: string; style?: React.CSSProperties }) {
+  return (
+    <div style={{ padding: "14px 16px", minWidth: 0, ...style }}>
+      <div style={{ fontSize: 13, color: "var(--mut)" }}>{label}</div>
+      <div className="num" style={{ fontSize: 18, fontWeight: 700, marginTop: 6, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{value}</div>
     </div>
   );
 }
