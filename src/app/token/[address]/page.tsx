@@ -8,7 +8,6 @@ import { TradeWidget, type CurveInputsSerialized } from "@/components/TradeWidge
 import { PriceChart } from "@/components/PriceChart";
 import { AgentConsole } from "@/components/AgentConsole";
 import { ClaimFees } from "@/components/ClaimFees";
-import { OrbioCredits } from "@/components/OrbioCredits";
 import { CopyButton } from "@/components/CopyButton";
 import { ModelLogo } from "@/components/ModelLogo";
 import { RhBadge } from "@/components/RhBadge";
@@ -193,12 +192,11 @@ export default function AgentPage({ params }: { params: { address: string } }) {
             </div>
           </div>
 
-          {/* Creator-only: claim the fees this agent earned + fund it via Orbio */}
+          {/* Creator-only: claim the fees this agent earned */}
           {isCreator && (
-            <div className="flex flex-col" style={{ gap: 10 }}>
+            <div className="flex flex-col" style={{ gap: 8 }}>
               <span className="mono" style={{ fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--cream)" }}>◆ You created this agent</span>
               <ClaimFees />
-              <OrbioCredits />
             </div>
           )}
 
