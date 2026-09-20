@@ -108,6 +108,32 @@ export default function AgentPage({ params }: { params: { address: string } }) {
             </div>
           )}
 
+          {/* About */}
+          {(bio || model?.personality) && (
+            <div className="card" style={{ padding: 18 }}>
+              <div style={{ fontWeight: 600, marginBottom: 8 }}>About</div>
+              {bio && <p style={{ color: "var(--mut)", fontSize: 14, lineHeight: 1.6 }}>{bio}</p>}
+              {model?.personality && (
+                <details style={{ marginTop: bio ? 12 : 0 }}>
+                  <summary style={{ cursor: "pointer", color: "var(--cream)", fontSize: 13 }}>Personality (system prompt)</summary>
+                  <p style={{ marginTop: 8, whiteSpace: "pre-wrap", color: "var(--mut)", fontSize: 13, lineHeight: 1.6 }}>{model.personality}</p>
+                </details>
+              )}
+            </div>
+          )}
+
+          {/* Details */}
+          <div className="card" style={{ padding: 18 }}>
+            <div style={{ fontWeight: 600, marginBottom: 12 }}>Details</div>
+            <Detail k="Contract" v={shortAddr(address)} />
+            <Detail k="Bonding curve" v={shortAddr(data?.curveAddress ?? "")} />
+            <Detail k="Creator" v={shortAddr(data?.deployer ?? "")} />
+            <Detail k="Paired asset" v="ETH (native)" />
+            <Detail k="Brain" v={`${p.name} · ${model?.modelName ?? "—"}`} />
+            <Detail k="Phase" v={data?.phaseLabel ?? "—"} />
+            <Detail k="Compute funded" v={usd(pool?.creditedUsd ?? 0)} />
+          </div>
+
           <p className="notice">This is a demo interface. Agents, markets and compute figures may be simulated; tokens can be volatile or lose all value. You sign every transaction — {"Neuma"} does not custody assets or give financial advice.</p>
         </div>
 
@@ -141,6 +167,14 @@ function Stat({ label, value }: { label: string; value: string }) {
     <div className="card-2" style={{ padding: 12 }}>
       <div style={{ fontSize: 11, color: "var(--dim)" }}>{label}</div>
       <div className="num" style={{ marginTop: 4, fontWeight: 700, fontSize: 15 }}>{value}</div>
+    </div>
+  );
+}
+function Detail({ k, v }: { k: string; v: string }) {
+  return (
+    <div className="flex items-center justify-between" style={{ padding: "10px 0", borderTop: "1px solid var(--border)", fontSize: 14 }}>
+      <span style={{ color: "var(--mut)" }}>{k}</span>
+      <span className="mono">{v}</span>
     </div>
   );
 }

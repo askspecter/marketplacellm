@@ -19,6 +19,7 @@ export function DeployButton({
   model,
   personality,
   temperature,
+  initialBuyEth,
   onLaunched,
 }: {
   name: string;
@@ -28,6 +29,7 @@ export function DeployButton({
   model: PickerModel | null;
   personality?: string;
   temperature?: number;
+  initialBuyEth?: string;
   onLaunched?: (token: string) => void;
 }) {
   const { address, isConnected } = useAccount();
@@ -101,6 +103,7 @@ export function DeployButton({
           description: description.trim(),
           imageUri,
           quoteAsset: "ETH",
+          initialBuyEth: initialBuyEth && Number(initialBuyEth) > 0 ? initialBuyEth : undefined,
         },
         address
       );
