@@ -8,7 +8,7 @@ import { v2CurveAbi } from "@/lib/pons/abisV2";
 import { type CurveQuoteInputs } from "@/lib/pons/quote";
 import { robinhoodChain, explorerTx } from "@/lib/chain";
 import { BURN_ADDRESS, BUYBACK_TOKEN, BUYBACK_USD, planBuyback } from "@/lib/buyback";
-import { usd as fmtUsd, compact } from "@/lib/format";
+import { compact, usdPrice } from "@/lib/format";
 
 const erc20Abi = [
   { type: "function", name: "balanceOf", stateMutability: "view", inputs: [{ name: "a", type: "address" }], outputs: [{ type: "uint256" }] },
@@ -84,7 +84,7 @@ export default function BuybackPage() {
       <h1 style={{ fontSize: 32, fontWeight: 700, letterSpacing: "-.02em", marginTop: 10 }}>$NEUMA buyback &amp; burn</h1>
       <p style={{ marginTop: 10, color: "var(--mut)", fontSize: 15, lineHeight: 1.6, maxWidth: "58ch" }}>
         Buy $NEUMA on the bonding curve and send it straight to the burn address in one signed transaction. Set the size
-        (default ${BUYBACK_USD}) and sign — the bought supply is removed forever. For a continuous ${BUYBACK_USD}/minute
+        (default ${BUYBACK_USD}) and sign - the bought supply is removed forever. For a continuous ${BUYBACK_USD}/minute
         engine, enable the automated keeper (see notes below).
       </p>
 
@@ -95,7 +95,7 @@ export default function BuybackPage() {
         </div>
         <div className="stat-tile">
           <div className="st-k">Price</div>
-          <div className="st-v">{priceUsd != null ? fmtUsd(priceUsd, 6) : "…"}</div>
+          <div className="st-v">{priceUsd != null ? usdPrice(priceUsd) : "…"}</div>
         </div>
       </div>
 
