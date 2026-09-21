@@ -1,0 +1,17 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+solc_version = "0.8.26"
+evm_version = "cancun"
+optimizer = true
+optimizer_runs = 800
+remappings = [
+    "v4-core/=lib/v4-core/src/",
+    "forge-std/=lib/forge-std/src/",
+]
+
+# RPC endpoints. Set the Robinhood Chain RPC (the same one the app uses) and any
+# others you deploy to. Fill via env; do not commit private keys.
+[rpc_endpoints]
+robinhood = "${ROBINHOOD_RPC_URL}"

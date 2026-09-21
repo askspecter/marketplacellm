@@ -1,0 +1,9 @@
+# Foundry
+out/
+cache/
+lib/
+broadcast/
+
+# secrets / local env
+.env
+.env.*
