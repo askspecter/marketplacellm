@@ -9,8 +9,8 @@ export const BUYBACK_TOKEN =
   ((process.env.NEXT_PUBLIC_BUYBACK_TOKEN as `0x${string}`) ||
     "0xa6f1a20408c8edb181a0e8faa54357c70b8f730a") as `0x${string}`;
 
-/** Dollars spent per buyback round (default $2). */
-export const BUYBACK_USD = Number(process.env.NEXT_PUBLIC_BUYBACK_USD ?? "2");
+/** Dollars spent per buyback round (default $1). */
+export const BUYBACK_USD = Number(process.env.NEXT_PUBLIC_BUYBACK_USD ?? "1");
 
 /** Slippage tolerance for the buyback swap (bps). Buybacks can be lenient. */
 export const BUYBACK_SLIPPAGE_BPS = 500; // 5%

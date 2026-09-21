@@ -109,7 +109,7 @@ export default function BuybackPage() {
           <div className="flex items-center gap-2">
             <span className="mono" style={{ color: "var(--dim)" }}>$</span>
             <input className="input mono" value={usdAmount} onChange={(e) => setUsdAmount(e.target.value.replace(/[^0-9.]/g, ""))} inputMode="decimal" placeholder="2" style={{ maxWidth: 160 }} />
-            {[2, 5, 10].map((v) => (
+            {[1, 2, 5].map((v) => (
               <button key={v} onClick={() => setUsdAmount(String(v))} className={`pill pill--sm ${Number(usdAmount) === v ? "pill--active" : ""}`}>${v}</button>
             ))}
           </div>
