@@ -6,7 +6,12 @@ const PRODUCT: [string, string][] = [
   ["Create", "/create"],
   ["Portfolio", "/portfolio"],
   ["Compute", "/compute"],
+  ["Leaderboard", "/leaderboard"],
+  ["Stats", "/stats"],
+];
+const RESOURCES: [string, string][] = [
   ["Docs", "/docs"],
+  ["Memorandum", "/memo"],
 ];
 const LEGAL: [string, string][] = [
   ["Privacy Policy", "/privacy"],
@@ -30,6 +35,9 @@ export function Footer() {
         <div className="flex flex-col" style={{ gap: 18, marginTop: 22 }}>
           <FSection title="Product">
             {PRODUCT.map(([l, h]) => (<Link key={l} href={h} style={{ color: "var(--mut)", fontSize: 15 }} className="hover:text-[var(--text)]">{l}</Link>))}
+          </FSection>
+          <FSection title="Resources">
+            {RESOURCES.map(([l, h]) => (<Link key={l} href={h} style={{ color: "var(--mut)", fontSize: 15 }} className="hover:text-[var(--text)]">{l}</Link>))}
           </FSection>
           <FSection title="Legal">
             {LEGAL.map(([l, h]) => (<Link key={l} href={h} style={{ color: "var(--mut)", fontSize: 15 }} className="hover:text-[var(--text)]">{l}</Link>))}
