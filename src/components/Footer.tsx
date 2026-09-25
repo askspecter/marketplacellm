@@ -6,7 +6,6 @@ const PRODUCT: [string, string][] = [
   ["Create", "/create"],
   ["Portfolio", "/portfolio"],
   ["Compute", "/compute"],
-  ["Buyback", "/buyback"],
   ["Leaderboard", "/leaderboard"],
   ["Stats", "/stats"],
 ];
